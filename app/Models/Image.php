@@ -15,6 +15,15 @@ class Image extends Model
         'description',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Image $model) {
+            $model->retrieval_id = generateRetrievalID();
+        });
+    }
+
     public function gallery(): BelongsTo
     {
         return $this->belongsTo(Gallery::class);

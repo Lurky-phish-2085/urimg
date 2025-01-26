@@ -16,6 +16,15 @@ class Gallery extends Model
         'description',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function (Gallery $model) {
+            $model->retrieval_id = generateRetrievalID();
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
