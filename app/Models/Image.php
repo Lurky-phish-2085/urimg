@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Image extends Model
@@ -13,4 +14,9 @@ class Image extends Model
         'title',
         'description',
     ];
+
+    public function gallery(): BelongsTo
+    {
+        return $this->belongsTo(Gallery::class);
+    }
 }
