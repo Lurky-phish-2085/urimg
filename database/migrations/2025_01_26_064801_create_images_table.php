@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('gallery_id')->constrained()->cascadeOnDelete();
             $table->string('retrieval_id')->unique()->default('');
+            $table->string('filename')->default('');
             $table->string('title')->default('');
             $table->string('description')->default('');
             $table->integer('views')->default(0);
