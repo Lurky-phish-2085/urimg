@@ -24,7 +24,7 @@ Route::domain(config('subdomains.image_retrieval') . '.' . env('APP_URL'))->grou
         }
 
         return Storage::response('images/' . $filename);
-    });
+    })->name(config('subdomains.image_retrieval') . '.' . 'image-retrieval');
 });
 
 Route::get('/', function () {
