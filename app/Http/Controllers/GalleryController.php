@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\File;
 
 class GalleryController extends Controller
 {
@@ -26,9 +28,27 @@ class GalleryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $request->validate([
+            'image' => [
+                'required',
+                File::image()
+                    ->max('20mb'),
+            ]
+        ]);
+
+        $imageFile = $request->file('image');
+
+        $gallery = Gallery::create();
+        $gallery->setInitialImage($imageFile);
+
+        return redirect(route(
+            'gallery',
+            ['retrieval_id' => $gallery->retrieval_id]
+        ))->with([
+            'editMode' => true,
+        ]);
     }
 
     /**

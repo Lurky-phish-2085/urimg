@@ -56,9 +56,7 @@ class Image extends Model
             return $no_whitespaces;
         };
 
-        $fullFilename = $this->filename;
-        $fullFilename .= ".{$extension}";
-
+        $fullFilename = $this->retrieval_id . ".{$extension}";
         $this->filename = $trim_and_remove_spaces($fullFilename);
 
         $this->save();

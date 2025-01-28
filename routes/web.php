@@ -7,6 +7,7 @@ use App\Models\Gallery;
 use App\Models\Image;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -59,10 +60,12 @@ Route::resource('images', ImageController::class)
 
 require __DIR__ . '/auth.php';
 
-Route::get('/{retrieval_id}', function (string $retrieval_id): Response {
+Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id): Response {
     $initImageUrl = function (Image $image) {
         $image->image_url = $image->image_url;
     };
+
+    $editMode = $request->session()->get('editMode');
 
     $gallery = Gallery::where('retrieval_id', $retrieval_id)->first();
     $image = Image::where('retrieval_id', $retrieval_id)->first();
@@ -76,5 +79,6 @@ Route::get('/{retrieval_id}', function (string $retrieval_id): Response {
 
     return Inertia::render('Gallery', [
         'images' => $images,
+        'editMode' => $editMode,
     ]);
 })->name('gallery');
