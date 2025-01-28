@@ -76,6 +76,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     }
 
     $isGallery = !is_null($gallery);
+    $galleryId = $isGallery ? $gallery->id : '';
     $images = $isGallery ? $gallery->images()->get() : [$image];
 
     foreach ($images as $image) {
@@ -83,6 +84,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     }
 
     return Inertia::render('Gallery', [
+        'galleryId' => $galleryId,
         'images' => $images,
         'editMode' => $editMode,
     ]);
