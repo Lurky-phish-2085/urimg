@@ -70,6 +70,11 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     $gallery = Gallery::where('retrieval_id', $retrieval_id)->first();
     $image = Image::where('retrieval_id', $retrieval_id)->first();
 
+    $notAvailable = is_null($gallery) && is_null($image);
+    if ($notAvailable) {
+        abort(404);
+    }
+
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
 
