@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\UploadedFile;
 
 class Gallery extends Model
 {
@@ -33,5 +34,12 @@ class Gallery extends Model
     public function images(): HasMany
     {
         return $this->hasMany(Image::class);
+    }
+
+    public function setInitialImage(UploadedFile $imageFile): void
+    {
+        $initialImage =  $this->images()->create();
+        $initialImage->setFileExtension($imageFile->extension());
+        $imageFile->storeAs('images', $initialImage->filename);
     }
 }
