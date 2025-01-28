@@ -3,11 +3,14 @@
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Gallery;
+use App\Models\Image;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 Route::domain(config('subdomains.image_retrieval') . '.' . env('APP_URL'))->group(function () {
@@ -20,7 +23,9 @@ Route::domain(config('subdomains.image_retrieval') . '.' . env('APP_URL'))->grou
         $imageRetrievalId = explode('.', $filename)[0];
 
         if (!Storage::exists($imagePath)) {
-            return redirect(url(env('APP_URL') . '/' . $imageRetrievalId));
+            return redirect(
+                url(env('APP_URL') . '/' .  $imageRetrievalId)
+            );
         }
 
         return Storage::response('images/' . $filename);
@@ -53,3 +58,23 @@ Route::resource('images', ImageController::class)
     ->only(['index', 'store', 'update', 'destroy']);
 
 require __DIR__ . '/auth.php';
+
+Route::get('/{retrieval_id}', function (string $retrieval_id): Response {
+    $initImageUrl = function (Image $image) {
+        $image->image_url = $image->image_url;
+    };
+
+    $gallery = Gallery::where('retrieval_id', $retrieval_id)->first();
+    $image = Image::where('retrieval_id', $retrieval_id)->first();
+
+    $isGallery = !is_null($gallery);
+    $images = $isGallery ? $gallery->images()->get() : [$image];
+
+    foreach ($images as $image) {
+        $initImageUrl($image);
+    }
+
+    return Inertia::render('Gallery', [
+        'images' => $images,
+    ]);
+})->name('gallery');
