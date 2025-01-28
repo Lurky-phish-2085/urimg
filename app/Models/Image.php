@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\UploadedFile;
 
 class Image extends Model
 {
@@ -47,7 +48,13 @@ class Image extends Model
         return $this->belongsTo(Gallery::class);
     }
 
-    public function setFileExtension(string $extension): void
+    public function setImage(UploadedFile $imageFile): void
+    {
+        $this->setFileExtension($imageFile->extension());
+        $imageFile->storeAs('images', $this->filename);
+    }
+
+    private function setFileExtension(string $extension): void
     {
         $trim_and_remove_spaces = function ($string) {
             $trimmed = trim($string);

@@ -39,7 +39,6 @@ class Gallery extends Model
     public function setInitialImage(UploadedFile $imageFile): void
     {
         $initialImage =  $this->images()->create();
-        $initialImage->setFileExtension($imageFile->extension());
-        $imageFile->storeAs('images', $initialImage->filename);
+        $initialImage->setImage($imageFile);
     }
 }
