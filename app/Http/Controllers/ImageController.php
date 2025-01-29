@@ -51,6 +51,7 @@ class ImageController extends Controller
             ['retrieval_id' => $gallery->retrieval_id]
         ))->with([
             'editMode' => true,
+            'success' => 'Image successfully added to this gallery!'
         ]);
     }
 

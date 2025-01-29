@@ -48,6 +48,7 @@ class GalleryController extends Controller
             ['retrieval_id' => $gallery->retrieval_id]
         ))->with([
             'editMode' => true,
+            'success' => 'Gallery created with uploaded image!',
         ]);
     }
 
@@ -70,7 +71,7 @@ class GalleryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Gallery $gallery)
+    public function update(Gallery $gallery)
     {
         //
     }
@@ -78,8 +79,12 @@ class GalleryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Gallery $gallery)
+    public function destroy(Gallery $gallery): RedirectResponse
     {
         $gallery->delete();
+
+        return redirect(route('home'))->with(
+            ['success' => 'Gallery deleted successfully!']
+        );
     }
 }

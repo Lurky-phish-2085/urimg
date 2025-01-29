@@ -33,12 +33,15 @@ Route::domain(config('subdomains.image_retrieval') . '.' . env('APP_URL'))->grou
     })->name(config('subdomains.image_retrieval') . '.' . 'image-retrieval');
 });
 
-Route::get('/', function () {
+Route::get('/', function (Request $request) {
+    $successMsg = $request->session()->get('success');
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'success' => $successMsg,
     ]);
 })->name('home');
 
@@ -66,6 +69,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     };
 
     $editMode = $request->session()->get('editMode');
+    $successMsg = $request->session()->get('success');
 
     $gallery = Gallery::where('retrieval_id', $retrieval_id)->first();
     $image = Image::where('retrieval_id', $retrieval_id)->first();
@@ -87,5 +91,6 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
         'galleryId' => $galleryId,
         'images' => $images,
         'editMode' => $editMode,
+        'success' => $successMsg,
     ]);
 })->name('gallery');
