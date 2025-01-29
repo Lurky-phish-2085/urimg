@@ -1,10 +1,18 @@
+import { Button } from '@/Components/ui/button';
 import { PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { RiGitRepositoryFill } from 'react-icons/ri';
 
 export default function Welcome({
     auth,
-}: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+    success,
+}: PageProps<{ laravelVersion: string; phpVersion: string; success: string }>) {
+    useEffect(() => {
+        if (!success) return;
+        alert(success);
+    }, [success]);
+
     return (
         <>
             <Head title="Welcome">
@@ -61,7 +69,9 @@ export default function Welcome({
                                 </nav>
                             </header>
                         </div>
-                        <main className="flex-grow"></main>
+                        <main className="flex-grow">
+                            <UploadForm />
+                        </main>
                     </div>
                     <footer className="mt-auto flex min-w-full flex-col items-center justify-center overflow-hidden p-4">
                         <p>
@@ -91,6 +101,66 @@ export default function Welcome({
                     </footer>
                 </div>
             </div>
+        </>
+    );
+}
+
+function UploadForm() {
+    const { setData, post, processing, errors } = useForm<{
+        image?: Blob | null;
+    }>({
+        image: null,
+    });
+
+    const [imgPreview, setImgPreview] = useState<string | undefined>('');
+
+    function handleChange(e: ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files ? e.target.files[0] : null;
+        setData('image', file);
+
+        if (!file) {
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            setImgPreview(e.target?.result?.toString());
+        };
+
+        if (file?.type.startsWith('image/')) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function submit(e: FormEvent) {
+        e.preventDefault();
+        post(route('galleries.store'));
+    }
+
+    return (
+        <>
+            <form onSubmit={submit}>
+                <h1>Upload Image</h1>
+                <input
+                    type="file"
+                    accept="image/*"
+                    disabled={processing}
+                    onChange={handleChange}
+                />
+                <Button type="submit" disabled={processing}>
+                    UPLOAD
+                </Button>
+                <div>
+                    <small className="text-red-500">{errors.image}</small>
+                </div>
+            </form>
+            <img
+                className={imgPreview ? 'block' : 'hidden'}
+                src={imgPreview}
+                alt="preview"
+                width={256}
+            />
         </>
     );
 }
