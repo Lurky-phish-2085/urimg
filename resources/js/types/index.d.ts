@@ -7,6 +7,12 @@ export interface User {
     email_verified_at?: string;
 }
 
+export interface GalleryData {
+    id: number;
+    title: string;
+    description: string;
+}
+
 export interface ImageData {
     id: number;
     title: string;
