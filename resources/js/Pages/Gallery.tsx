@@ -1,7 +1,6 @@
-import { Button } from '@/Components/ui/button';
 import { Image, PageProps } from '@/types';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { ChangeEvent, FormEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 
 export default function Gallery({
     galleryId,
@@ -14,7 +13,7 @@ export default function Gallery({
     editMode: boolean;
     success: string;
 }>) {
-    const { setData, post, processing, errors } = useForm<{
+    const { data, post, processing, errors } = useForm<{
         galleryId: string;
         image?: Blob | null;
     }>({
@@ -39,14 +38,14 @@ export default function Gallery({
         };
     }, [success]);
 
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files ? e.target.files[0] : null;
-        setData('image', file);
+    function submit() {
+        post(route('images.store'));
     }
 
-    function submit(e: FormEvent) {
-        e.preventDefault();
-        post(route('images.store'));
+    function handleChange(e: ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files ? e.target.files[0] : null;
+        data.image = file;
+        submit();
     }
 
     return (
@@ -56,7 +55,7 @@ export default function Gallery({
                 {editMode && (
                     <div className="flex flex-col gap-2 p-2">
                         <h1>Edit Mode</h1>
-                        <form onSubmit={submit}>
+                        <form>
                             <h1>Upload Image</h1>
                             <input
                                 type="file"
@@ -68,7 +67,6 @@ export default function Gallery({
                                 <small className="text-red-500">
                                     {errors.image}
                                 </small>
-                                <Button type="submit">Upload</Button>
                             </div>
                         </form>
                         <Link
