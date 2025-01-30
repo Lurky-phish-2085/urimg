@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gallery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\File;
 
 class GalleryController extends Controller
@@ -71,9 +72,30 @@ class GalleryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Gallery $gallery)
+    public function update(Request $request, Gallery $gallery): RedirectResponse
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'max:40',
+            'description' => 'max:255',
+        ]);
+
+        if ($validator->fails()) {
+            redirect()->back()->withErrors($validator)->with([
+                'editMode' => true,
+            ]);
+        }
+
+        $gallery->update([
+            'title' => $request->title ?? '',
+            'description' => $request->description ?? '',
+        ]);
+
+        return redirect(route(
+            'gallery',
+            ['retrieval_id' => $gallery->retrieval_id],
+        ))->with([
+            'editMode' => true,
+        ]);
     }
 
     /**
