@@ -1,6 +1,7 @@
+import UploadImageForm from '@/Components/UploadImageForm';
 import { PageProps } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ChangeEvent, useEffect } from 'react';
+import { Head, Link } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { RiGitRepositoryFill } from 'react-icons/ri';
 
 export default function Welcome({
@@ -69,7 +70,7 @@ export default function Welcome({
                             </header>
                         </div>
                         <main className="flex-grow">
-                            <GalleryCreateForm />
+                            <UploadImageForm href={route('galleries.store')} />
                         </main>
                     </div>
                     <footer className="mt-auto flex min-w-full flex-col items-center justify-center overflow-hidden p-4">
@@ -100,41 +101,6 @@ export default function Welcome({
                     </footer>
                 </div>
             </div>
-        </>
-    );
-}
-
-function GalleryCreateForm() {
-    const { data, post, processing, errors } = useForm<{
-        image?: Blob | null;
-    }>({
-        image: null,
-    });
-
-    function submit() {
-        post(route('galleries.store'));
-    }
-
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files ? e.target.files[0] : null;
-        data.image = file;
-        submit();
-    }
-
-    return (
-        <>
-            <form>
-                <h1>Upload Image</h1>
-                <input
-                    type="file"
-                    accept="image/*"
-                    disabled={processing}
-                    onChange={handleChange}
-                />
-                <div>
-                    <small className="text-red-500">{errors.image}</small>
-                </div>
-            </form>
         </>
     );
 }
