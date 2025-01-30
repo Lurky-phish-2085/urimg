@@ -1,6 +1,5 @@
 import { GalleryData } from '@/types';
 import { Link, useForm } from '@inertiajs/react';
-import 'lodash.debounce';
 import { useRef, useState } from 'react';
 import UploadImageForm from './UploadImageForm';
 import { Button } from './ui/button';
