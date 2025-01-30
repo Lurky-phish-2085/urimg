@@ -7,7 +7,7 @@ export interface User {
     email_verified_at?: string;
 }
 
-export interface Image {
+export interface ImageData {
     id: number;
     title: string;
     description: string;

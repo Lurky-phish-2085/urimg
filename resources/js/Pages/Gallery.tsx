@@ -1,5 +1,6 @@
+import Image from '@/Components/Image';
 import UploadImageForm from '@/Components/UploadImageForm';
-import { Image, PageProps } from '@/types';
+import { ImageData, PageProps } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect } from 'react';
 
@@ -10,7 +11,7 @@ export default function Gallery({
     success,
 }: PageProps<{
     galleryId: string;
-    images: Image[];
+    images: ImageData[];
     editMode: boolean;
     success: string;
 }>) {
@@ -51,7 +52,7 @@ export default function Gallery({
                     </div>
                 )}
                 {images.map((image) => (
-                    <img key={image.id} src={image.image_url} width={256} />
+                    <Image key={image.id} data={image} />
                 ))}
             </div>
         </>
