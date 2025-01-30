@@ -3,15 +3,15 @@ import { ChangeEvent } from 'react';
 
 type UploadImageFormProps = {
     href: string;
-    galleryId?: string;
+    galleryId?: number | null;
 };
 
 export default function UploadImageForm({
     href,
-    galleryId = '',
+    galleryId = null,
 }: UploadImageFormProps) {
     const { data, post, processing, errors } = useForm<{
-        galleryId: string;
+        galleryId: number | null;
         image?: Blob | null;
     }>({
         galleryId: galleryId,

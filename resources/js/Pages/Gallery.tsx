@@ -1,16 +1,16 @@
+import GalleryEditForm from '@/Components/GalleryEditForm';
 import Image from '@/Components/Image';
-import UploadImageForm from '@/Components/UploadImageForm';
-import { ImageData, PageProps } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { GalleryData, ImageData, PageProps } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import { useEffect } from 'react';
 
 export default function Gallery({
-    galleryId,
+    gallery,
     images,
     editMode,
     success,
 }: PageProps<{
-    galleryId: string;
+    gallery: GalleryData;
     images: ImageData[];
     editMode: boolean;
     success: string;
@@ -34,23 +34,11 @@ export default function Gallery({
 
     return (
         <>
-            <Head title={editMode ? 'Edit Gallery' : 'Gallery'}></Head>
+            <Head
+                title={editMode ? 'Edit Gallery' : 'Gallery - ' + gallery.title}
+            ></Head>
             <div className="flex flex-col gap-2 p-4">
-                {editMode && (
-                    <div className="flex flex-col gap-2 p-2">
-                        <h1>Edit Mode</h1>
-                        <UploadImageForm
-                            href={route('images.store')}
-                            galleryId={galleryId}
-                        />
-                        <Link
-                            method="delete"
-                            href={route('galleries.destroy', galleryId)}
-                        >
-                            Delete
-                        </Link>
-                    </div>
-                )}
+                {editMode && <GalleryEditForm galleryData={gallery} />}
                 {images.map((image) => (
                     <Image key={image.id} data={image} />
                 ))}
