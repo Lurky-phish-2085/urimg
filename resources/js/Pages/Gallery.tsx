@@ -41,7 +41,7 @@ export default function Gallery({
             <div className="flex flex-col gap-2 p-4">
                 {editMode && <GalleryEditForm galleryData={gallery} />}
                 {images.map((image) => (
-                    <Image key={image.id} data={image} />
+                    <Image key={image.id} data={image} editMode={editMode} />
                 ))}
             </div>
         </>
