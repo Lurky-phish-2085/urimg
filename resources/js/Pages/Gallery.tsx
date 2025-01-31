@@ -36,10 +36,26 @@ export default function Gallery({
     return (
         <>
             <Head
-                title={editMode ? 'Edit Gallery' : 'Gallery - ' + gallery.title}
+                title={
+                    editMode
+                        ? 'Edit Gallery'
+                        : `Gallery - ${gallery ? gallery.title || gallery.retrieval_id : images.at(0)?.retrieval_id}`
+                }
             ></Head>
             <div className="flex flex-col gap-2 p-4">
-                {editMode && <GalleryEditForm galleryData={gallery} />}
+                {editMode ? (
+                    <GalleryEditForm galleryData={gallery} />
+                ) : gallery ? (
+                    <>
+                        <h1 className="text-xl">
+                            {gallery.title || gallery.retrieval_id}
+                        </h1>
+                        <hr />
+                        <p>{gallery.description}</p>
+                    </>
+                ) : (
+                    <></>
+                )}
                 {images.map((image) => (
                     <Image key={image.id} data={image} editMode={editMode} />
                 ))}
