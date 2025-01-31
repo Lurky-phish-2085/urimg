@@ -7,6 +7,7 @@ use App\Models\Image;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ImageController extends Controller
 {
@@ -76,7 +77,25 @@ class ImageController extends Controller
      */
     public function update(Request $request, Image $image)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'max:40',
+            'description' => 'max:255',
+        ]);
+
+        if ($validator->fails()) {
+            redirect()->back()->withErrors($validator)->with([
+                'editMode' => true,
+            ]);
+        }
+
+        $image->update([
+            'title' => $request->title ?? '',
+            'description' => $request->description ?? '',
+        ]);
+
+        redirect()->back()->with([
+            'editMode' => true,
+        ]);
     }
 
     /**
