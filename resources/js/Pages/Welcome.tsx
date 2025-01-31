@@ -1,10 +1,18 @@
+import UploadImageForm from '@/Components/UploadImageForm';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { RiGitRepositoryFill } from 'react-icons/ri';
 
 export default function Welcome({
     auth,
-}: PageProps<{ laravelVersion: string; phpVersion: string }>) {
+    success,
+}: PageProps<{ laravelVersion: string; phpVersion: string; success: string }>) {
+    useEffect(() => {
+        if (!success) return;
+        alert(success);
+    }, [success]);
+
     return (
         <>
             <Head title="Welcome">
@@ -61,7 +69,9 @@ export default function Welcome({
                                 </nav>
                             </header>
                         </div>
-                        <main className="flex-grow"></main>
+                        <main className="flex-grow">
+                            <UploadImageForm href={route('galleries.store')} />
+                        </main>
                     </div>
                     <footer className="mt-auto flex min-w-full flex-col items-center justify-center overflow-hidden p-4">
                         <p>
