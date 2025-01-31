@@ -5,17 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Gallery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\File;
+use Inertia\Inertia;
+use Inertia\Response;
 
-class GalleryController extends Controller
+class GalleryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth', only: ['index']),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): Response
     {
-        //
+        $galleries = $request->user()->galleries()->latest()->get();
+
+        return Inertia::render('MyGalleries', [
+            'galleries' => $galleries
+        ]);
     }
 
     /**
@@ -39,9 +54,11 @@ class GalleryController extends Controller
             ]
         ]);
 
+        $user = $request->user();
+
         $imageFile = $request->file('image');
 
-        $gallery = Gallery::create();
+        $gallery = $user ? $user->galleries()->create() : Gallery::create();
         $gallery->setInitialImage($imageFile);
 
         return redirect(route(
