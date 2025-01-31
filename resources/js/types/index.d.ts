@@ -7,16 +7,16 @@ export interface User {
     email_verified_at?: string;
 }
 
-export interface GalleryData {
+export interface Content {
     id: number;
+    retrieval_id: string;
     title: string;
     description: string;
 }
 
-export interface ImageData {
-    id: number;
-    title: string;
-    description: string;
+export interface GalleryData extends Content {}
+
+export interface ImageData extends Content {
     image_url: string;
 }
 
