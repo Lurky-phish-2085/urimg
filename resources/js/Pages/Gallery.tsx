@@ -19,7 +19,11 @@ export default function Gallery({
     const { auth } = usePage().props;
 
     const canEdit = useCallback((): boolean => {
-        return editMode || auth.user ? auth.user.id === gallery.user_id : false;
+        if (!auth.user) {
+            return editMode;
+        }
+
+        return auth.user.id ? auth.user.id === gallery.user_id : false;
     }, []);
 
     useEffect(() => {
