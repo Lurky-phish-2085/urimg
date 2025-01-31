@@ -2,8 +2,8 @@ import Image from '@/Components/Image';
 import UploadImageForm from '@/Components/UploadImageForm';
 import { GalleryData, ImageData, PageProps } from '@/types';
 import { Button } from '@headlessui/react';
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import { useEffect, useRef, useState } from 'react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export default function Gallery({
     gallery,
@@ -16,6 +16,16 @@ export default function Gallery({
     editMode: boolean;
     success: string;
 }>) {
+    const { auth } = usePage().props;
+
+    const canEdit = useCallback((): boolean => {
+        if (!auth.user) {
+            return editMode;
+        }
+
+        return auth.user.id ? auth.user.id === gallery.user_id : false;
+    }, []);
+
     useEffect(() => {
         if (!success) return;
         alert(success);
@@ -37,13 +47,13 @@ export default function Gallery({
         <>
             <Head
                 title={
-                    editMode
+                    canEdit()
                         ? 'Edit Gallery'
                         : `Gallery - ${gallery ? gallery.title || gallery.retrieval_id : images.at(0)?.retrieval_id}`
                 }
             ></Head>
             <div className="flex flex-col gap-2 p-4">
-                {editMode ? (
+                {canEdit() ? (
                     <GalleryEditForm galleryData={gallery} />
                 ) : gallery ? (
                     <>
@@ -57,7 +67,7 @@ export default function Gallery({
                     <></>
                 )}
                 {images.map((image) => (
-                    <Image key={image.id} data={image} editMode={editMode} />
+                    <Image key={image.id} data={image} editMode={canEdit()} />
                 ))}
             </div>
         </>
