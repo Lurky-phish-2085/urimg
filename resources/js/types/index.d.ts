@@ -14,7 +14,9 @@ export interface Content {
     description: string;
 }
 
-export interface GalleryData extends Content {}
+export interface GalleryData extends Content {
+    user_id: number;
+}
 
 export interface ImageData extends Content {
     image_url: string;
