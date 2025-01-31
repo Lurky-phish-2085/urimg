@@ -22,7 +22,10 @@ export default function Image({ data, editMode }: ImageProps) {
     const inputRef1 = useRef<HTMLInputElement | null>(null);
     const inputRef2 = useRef<HTMLInputElement | null>(null);
     const submit = () => {
-        patch(route('images.update', data.id));
+        patch(route('images.update', data.id), {
+            preserveScroll: true,
+            preserveState: true,
+        });
         inputRef1.current?.blur();
         inputRef2.current?.blur();
     };

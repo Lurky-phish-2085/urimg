@@ -83,7 +83,10 @@ function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
     const inputRef1 = useRef<HTMLInputElement | null>(null);
     const inputRef2 = useRef<HTMLInputElement | null>(null);
     const submit = () => {
-        patch(route('galleries.update', galleryData.id));
+        patch(route('galleries.update', galleryData.id), {
+            preserveScroll: true,
+            preserveState: true,
+        });
         inputRef1.current?.blur();
         inputRef2.current?.blur();
     };
