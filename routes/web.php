@@ -43,7 +43,7 @@ Route::get('/', function (Request $request) {
         'phpVersion' => PHP_VERSION,
         'success' => $successMsg,
     ]);
-})->name('home');
+})->name('home')->middleware('guest');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
