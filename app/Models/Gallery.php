@@ -30,7 +30,7 @@ class Gallery extends Model
     protected function isFromCommunity(): Attribute
     {
         return Attribute::make(
-            get: fn() => !is_null($this->user_id)
+            get: fn(): bool => !is_null($this->user_id)
         );
     }
 

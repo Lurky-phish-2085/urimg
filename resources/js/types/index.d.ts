@@ -24,7 +24,11 @@ export interface ImageData extends Content {
 
 export interface CommentData {
     id: number;
+    user_id: number;
+    author_name: string;
     content: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export type PageProps<
