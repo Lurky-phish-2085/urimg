@@ -63,6 +63,7 @@ Route::resource('images', ImageController::class)
     ->only(['index', 'store', 'update', 'destroy']);
 
 Route::post('/galleries/{galleryId}/comments', [CommentController::class, 'store'])
+    ->middleware(['auth'])
     ->name('comments.store');
 
 require __DIR__ . '/auth.php';
