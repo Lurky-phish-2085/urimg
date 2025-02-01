@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
@@ -60,6 +61,9 @@ Route::resource('galleries', GalleryController::class)
 
 Route::resource('images', ImageController::class)
     ->only(['index', 'store', 'update', 'destroy']);
+
+Route::post('/galleries/{galleryId}/comments', [CommentController::class, 'store'])
+    ->name('comments.store');
 
 require __DIR__ . '/auth.php';
 
