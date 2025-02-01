@@ -1,9 +1,16 @@
 import Image from '@/Components/Image';
+import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
-import { GalleryData, ImageData, PageProps } from '@/types';
-import { Button } from '@headlessui/react';
+import { CommentData, GalleryData, ImageData, PageProps } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    ChangeEvent,
+    FormEvent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 
 export default function Gallery({
     gallery,
@@ -73,6 +80,12 @@ export default function Gallery({
                 {images.map((image) => (
                     <Image key={image.id} data={image} editMode={canEdit()} />
                 ))}
+                {isFromCommunity && (
+                    <CommentSection
+                        galleryId={gallery.id}
+                        comments={comments}
+                    />
+                )}
             </div>
         </>
     );
@@ -175,5 +188,51 @@ function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
                 </Link>
             </div>
         </>
+    );
+}
+
+type CommentSectionProps = {
+    galleryId: number;
+    comments: CommentData[];
+};
+
+function CommentSection({ galleryId, comments }: CommentSectionProps) {
+    const { data, setData, processing, post, reset } = useForm<{
+        content: string;
+    }>({
+        content: '',
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setData('content', e.target.value);
+    };
+
+    const submit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        post(route('comments.store', galleryId), {
+            preserveScroll: true,
+            preserveState: true,
+        });
+        reset();
+    };
+
+    return (
+        <section className="border border-red-500 p-4">
+            <h1 className="text-xl">Comments</h1>
+            <form onSubmit={submit}>
+                <textarea
+                    placeholder="Type your comment here!"
+                    value={data.content}
+                    disabled={processing}
+                    onChange={handleChange}
+                ></textarea>
+                <Button type="submit" disabled={processing}>
+                    Comment
+                </Button>
+            </form>
+            {comments.map((comment) => (
+                <p key={comment.id}>{comment.content}</p>
+            ))}
+        </section>
     );
 }
