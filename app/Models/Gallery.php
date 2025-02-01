@@ -36,6 +36,11 @@ class Gallery extends Model
         return $this->hasMany(Image::class);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function setInitialImage(UploadedFile $imageFile): void
     {
         $initialImage =  $this->images()->create();

@@ -13,4 +13,14 @@ class Comment extends Model
     protected $fillable = [
         'content',
     ];
+
+    public function gallery(): BelongsTo
+    {
+        return $this->belongsTo(Gallery::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
