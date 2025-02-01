@@ -3,6 +3,8 @@ import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
 import { CommentData, GalleryData, ImageData, PageProps } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import {
     ChangeEvent,
     FormEvent,
@@ -11,6 +13,8 @@ import {
     useRef,
     useState,
 } from 'react';
+
+dayjs.extend(relativeTime);
 
 export default function Gallery({
     gallery,
@@ -81,10 +85,7 @@ export default function Gallery({
                     <Image key={image.id} data={image} editMode={canEdit()} />
                 ))}
                 {isFromCommunity && (
-                    <CommentSection
-                        galleryId={gallery.id}
-                        comments={comments}
-                    />
+                    <CommentSection gallery={gallery} comments={comments} />
                 )}
             </div>
         </>
@@ -192,11 +193,13 @@ function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
 }
 
 type CommentSectionProps = {
-    galleryId: number;
+    gallery: GalleryData;
     comments: CommentData[];
 };
 
-function CommentSection({ galleryId, comments }: CommentSectionProps) {
+function CommentSection({ gallery, comments }: CommentSectionProps) {
+    const { auth } = usePage().props;
+
     const { data, setData, processing, post, reset } = useForm<{
         content: string;
     }>({
@@ -209,7 +212,7 @@ function CommentSection({ galleryId, comments }: CommentSectionProps) {
 
     const submit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('comments.store', galleryId), {
+        post(route('comments.store', gallery.id), {
             preserveScroll: true,
             preserveState: true,
         });
@@ -231,7 +234,33 @@ function CommentSection({ galleryId, comments }: CommentSectionProps) {
                 </Button>
             </form>
             {comments.map((comment) => (
-                <p key={comment.id}>{comment.content}</p>
+                <div key={comment.id} className="my-4 border border-red-300">
+                    <div className="flex items-center gap-2 text-slate-500">
+                        <small>
+                            <a href="" className="underline">
+                                {comment.author_name}
+                            </a>
+                            {comment.user_id === gallery.user_id && (
+                                <>
+                                    <span>&nbsp;</span>
+                                    <strong className="text-blue-500">
+                                        [ OP ]
+                                    </strong>
+                                </>
+                            )}
+                        </small>
+                        <div className="flex gap-1">
+                            <small>{dayjs(comment.created_at).fromNow()}</small>
+                            {comment.created_at !== comment.updated_at && (
+                                <>
+                                    <span>&middot;</span>
+                                    <small>edited</small>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <p>{comment.content}</p>
+                </div>
             ))}
         </section>
     );
