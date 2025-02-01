@@ -4,6 +4,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Comment;
 use App\Models\Gallery;
 use App\Models\Image;
 use Illuminate\Foundation\Application;
@@ -69,8 +70,11 @@ Route::post('/galleries/{galleryId}/comments', [CommentController::class, 'store
 require __DIR__ . '/auth.php';
 
 Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id): Response {
-    $initImageUrl = function (Image $image) {
+    $initImageUrl = function (Image $image): void {
         $image->image_url = $image->image_url;
+    };
+    $initCommentData = function (Comment $comment): void {
+        $comment->author_name = $comment->author_name;
     };
 
     $editMode = $request->session()->get('editMode');
@@ -86,15 +90,19 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
 
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
+    $comments = $isGallery ? $gallery->comments()->get() : [];
 
     foreach ($images as $image) {
         $initImageUrl($image);
+    }
+    foreach ($comments as $comment) {
+        $initCommentData($comment);
     }
 
     return Inertia::render('Gallery', [
         'gallery' => $gallery,
         'images' => $images,
-        'comments' => $gallery->comments()->get(),
+        'comments' => $comments,
         'isFromCommunity' => $gallery->is_from_community,
         'editMode' => $editMode,
         'success' => $successMsg,
