@@ -8,11 +8,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export default function Gallery({
     gallery,
     images,
+    comments,
+    isFromCommunity,
     editMode,
     success,
 }: PageProps<{
     gallery: GalleryData;
     images: ImageData[];
+    comments: CommentData[];
+    isFromCommunity: boolean;
     editMode: boolean;
     success: string;
 }>) {

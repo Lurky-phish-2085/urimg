@@ -22,6 +22,11 @@ export interface ImageData extends Content {
     image_url: string;
 }
 
+export interface CommentData {
+    id: number;
+    content: string;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {

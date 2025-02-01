@@ -94,6 +94,8 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     return Inertia::render('Gallery', [
         'gallery' => $gallery,
         'images' => $images,
+        'comments' => $gallery->comments()->get(),
+        'isFromCommunity' => $gallery->is_from_community,
         'editMode' => $editMode,
         'success' => $successMsg,
     ]);
