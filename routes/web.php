@@ -103,7 +103,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
         'gallery' => $gallery,
         'images' => $images,
         'comments' => $comments,
-        'isFromCommunity' => $gallery->is_from_community,
+        'isFromCommunity' => $gallery->is_from_community ?? false,
         'editMode' => $editMode,
         'success' => $successMsg,
     ]);
