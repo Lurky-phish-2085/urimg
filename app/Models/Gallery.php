@@ -49,6 +49,11 @@ class Gallery extends Model
         return $this->hasMany(Comment::class);
     }
 
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
     public function setInitialImage(UploadedFile $imageFile): void
     {
         $initialImage =  $this->images()->create();
