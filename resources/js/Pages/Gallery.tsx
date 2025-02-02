@@ -93,6 +93,7 @@ export default function Gallery({
                     <div className="flex gap-2">
                         <Link
                             className={
+                                auth.user &&
                                 likes.filter(
                                     (v) =>
                                         v.liked && v.user_id === auth.user.id,
@@ -109,6 +110,7 @@ export default function Gallery({
                         </Link>
                         <Link
                             className={
+                                auth.user &&
                                 likes.filter(
                                     (v) =>
                                         !v.liked && v.user_id === auth.user.id,
