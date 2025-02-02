@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\Like;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -125,5 +126,53 @@ class GalleryController extends Controller implements HasMiddleware
         return redirect(route('home'))->with(
             ['success' => 'Gallery deleted successfully!']
         );
+    }
+
+    public function like(Request $request, int $galleryId): RedirectResponse
+    {
+        $user = $request->user();
+        $gallery = Gallery::findOrFail($galleryId);
+
+        $liked = Like::where('user_id', $user->id)->where('liked', true)->first();
+        if ($liked) {
+            $liked->delete();
+
+            return redirect()->back()->with([
+                'success' => 'User successfully un-liked the post!',
+            ]);
+        }
+
+        $gallery->likes()->updateOrCreate(
+            ['user_id' => $user->id, 'liked' => false],
+            ['liked' => true],
+        );
+
+        return redirect()->back()->with([
+            'success' => 'User successfully liked the post!',
+        ]);
+    }
+
+    public function dislike(Request $request, int $galleryId): RedirectResponse
+    {
+        $user = $request->user();
+        $gallery = Gallery::findOrFail($galleryId);
+
+        $disliked = Like::where('user_id', $user->id)->where('liked', false)->first();
+        if ($disliked) {
+            $disliked->delete();
+
+            return redirect()->back()->with([
+                'success' => 'User successfully un-disliked the post!',
+            ]);
+        }
+
+        $gallery->likes()->updateOrCreate(
+            ['user_id' => $user->id, 'liked' => true],
+            ['liked' => false],
+        );
+
+        return redirect()->back()->with([
+            'success' => 'User successfully disliked the post!',
+        ]);
     }
 }

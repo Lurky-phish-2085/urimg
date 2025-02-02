@@ -1,7 +1,13 @@
 import Image from '@/Components/Image';
 import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
-import { CommentData, GalleryData, ImageData, PageProps } from '@/types';
+import {
+    CommentData,
+    GalleryData,
+    ImageData,
+    LikeData,
+    PageProps,
+} from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -20,6 +26,7 @@ export default function Gallery({
     gallery,
     images,
     comments,
+    likes,
     isFromCommunity,
     editMode,
     success,
@@ -27,6 +34,7 @@ export default function Gallery({
     gallery: GalleryData;
     images: ImageData[];
     comments: CommentData[];
+    likes: LikeData[];
     isFromCommunity: boolean;
     editMode: boolean;
     success: string;
@@ -80,6 +88,42 @@ export default function Gallery({
                     </>
                 ) : (
                     <></>
+                )}
+                {isFromCommunity && (
+                    <div className="flex gap-2">
+                        <Link
+                            className={
+                                likes.filter(
+                                    (v) =>
+                                        v.liked && v.user_id === auth.user.id,
+                                ).length !== 0
+                                    ? 'text-blue-500 underline'
+                                    : ''
+                            }
+                            as="button"
+                            method="post"
+                            href={route('galleries.like', gallery.id)}
+                        >
+                            {'Like ' +
+                                likes.filter((like) => like.liked).length}
+                        </Link>
+                        <Link
+                            className={
+                                likes.filter(
+                                    (v) =>
+                                        !v.liked && v.user_id === auth.user.id,
+                                ).length !== 0
+                                    ? 'text-red-500 underline'
+                                    : ''
+                            }
+                            as="button"
+                            method="post"
+                            href={route('galleries.dislike', gallery.id)}
+                        >
+                            {'Dislike ' +
+                                likes.filter((like) => !like.liked).length}
+                        </Link>
+                    </div>
                 )}
                 {images.map((image) => (
                     <Image key={image.id} data={image} editMode={canEdit()} />
