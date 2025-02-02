@@ -198,8 +198,6 @@ type CommentSectionProps = {
 };
 
 function CommentSection({ gallery, comments }: CommentSectionProps) {
-    const { auth } = usePage().props;
-
     const { data, setData, processing, post, reset } = useForm<{
         content: string;
     }>({
@@ -234,10 +232,10 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
                 </Button>
             </form>
             {comments.map((comment) => (
-                <div key={comment.id} className="my-4 border border-red-300">
+                <div key={comment.id} className="my-4 divide-y-2">
                     <div className="flex items-center gap-2 text-slate-500">
                         <small>
-                            <a href="" className="underline">
+                            <a href="" className="underline hover:text-black">
                                 {comment.author_name}
                             </a>
                             {comment.user_id === gallery.user_id && (
