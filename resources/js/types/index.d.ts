@@ -31,6 +31,14 @@ export interface CommentData {
     updated_at: string;
 }
 
+export interface LikeData {
+    id: number;
+    user_id: number;
+    liked: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
