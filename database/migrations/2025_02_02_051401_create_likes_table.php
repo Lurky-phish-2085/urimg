@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->boolean('liked');
             $table->timestamps();
+
+            $table->unique(['user_id', 'gallery_id']);
         });
     }
 
