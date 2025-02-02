@@ -67,6 +67,14 @@ Route::post('/galleries/{galleryId}/comments', [CommentController::class, 'store
     ->middleware(['auth'])
     ->name('comments.store');
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/galleries/{galleryId}/like', [GalleryController::class, 'like'])
+        ->name('galleries.like');
+
+    Route::post('/galleries/{galleryId}/dislike', [GalleryController::class, 'dislike'])
+        ->name('galleries.dislike');
+});
+
 require __DIR__ . '/auth.php';
 
 Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id): Response {
@@ -91,6 +99,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
     $comments = $isGallery ? $gallery->comments()->get() : [];
+    $likes = $isGallery ? $gallery->likes()->latest()->get() : [];
 
     foreach ($images as $image) {
         $initImageUrl($image);
@@ -103,6 +112,7 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
         'gallery' => $gallery,
         'images' => $images,
         'comments' => $comments,
+        'likes' => $likes,
         'isFromCommunity' => $gallery->is_from_community ?? false,
         'editMode' => $editMode,
         'success' => $successMsg,
