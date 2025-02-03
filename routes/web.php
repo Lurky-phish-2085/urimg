@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Models\Comment;
 use App\Models\Gallery;
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -74,6 +75,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/galleries/{galleryId}/dislike', [GalleryController::class, 'dislike'])
         ->name('galleries.dislike');
 });
+
+Route::get('/user/{username}', function (string $username) {
+    $userExist = User::where('name', $username)->exists();
+
+    if (!$userExist) {
+        abort(404);
+    }
+
+    $user = User::where('name', $username)->first();
+
+    return Inertia::render('UserPage')->with([
+        'galleries' => $user->galleries()->latest()->get(),
+        'username' => $user->name,
+    ]);
+})->name('user-page');
 
 require __DIR__ . '/auth.php';
 

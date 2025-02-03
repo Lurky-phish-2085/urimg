@@ -281,7 +281,10 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
                 <div key={comment.id} className="my-4 divide-y-2">
                     <div className="flex items-center gap-2 text-slate-500">
                         <small>
-                            <a href="" className="underline hover:text-black">
+                            <a
+                                href={route('user-page', comment.author_name)}
+                                className="underline hover:text-black"
+                            >
                                 {comment.author_name}
                             </a>
                             {comment.user_id === gallery.user_id && (
