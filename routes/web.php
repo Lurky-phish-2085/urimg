@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
@@ -76,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('galleries.dislike');
 });
 
-Route::get('/user/{username}', function (string $username) {
+Route::get('/user/{username}', function (string $username, Request $request) {
     $userExist = User::where('name', $username)->exists();
 
     if (!$userExist) {
@@ -84,12 +85,19 @@ Route::get('/user/{username}', function (string $username) {
     }
 
     $user = User::where('name', $username)->first();
+    $following = $request->user()->followees()->where('followee_id', $user->id)->exists();
 
     return Inertia::render('UserPage')->with([
         'galleries' => $user->galleries()->latest()->get(),
-        'username' => $user->name,
+        'profileUser' => $user,
+        'following' => $following,
     ]);
 })->name('user-page');
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/follow/{user}', [FollowController::class, 'follow'])->name('follow');
+    Route::post('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
+});
 
 require __DIR__ . '/auth.php';
 
