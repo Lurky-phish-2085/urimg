@@ -1,12 +1,38 @@
-import { GalleryData, PageProps } from '@/types';
+import { GalleryData, PageProps, User } from '@/types';
+import { Link } from '@inertiajs/react';
 
 export default function UserPage({
+    auth,
     galleries,
-    username,
-}: PageProps<{ galleries: GalleryData[]; username: string }>) {
+    profileUser,
+    following,
+}: PageProps<{
+    galleries: GalleryData[];
+    profileUser: User;
+    following: boolean;
+}>) {
     return (
         <>
-            <h1 className="text-xl">{`${username}'s Galleries`}</h1>
+            <h1 className="text-xl">{`${profileUser.name}'s Galleries`}</h1>
+            {auth.user.id !== profileUser.id ? (
+                <Link
+                    as="button"
+                    method="post"
+                    href={
+                        following
+                            ? route('unfollow', profileUser.id)
+                            : route('follow', profileUser.id)
+                    }
+                >
+                    {following ? (
+                        <div className="text-blue-500 underline">Following</div>
+                    ) : (
+                        <div className="hover:underline">Follow</div>
+                    )}
+                </Link>
+            ) : (
+                <></>
+            )}
             {galleries.length > 0 ? (
                 galleries.map((gallery) => (
                     <a
