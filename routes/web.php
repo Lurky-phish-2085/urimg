@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ProfileController;
@@ -74,9 +75,12 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/galleries/{galleryId}/dislike', [GalleryController::class, 'dislike'])
         ->name('galleries.dislike');
+
+    Route::post('/galleries/{galleryId}/removeLike', [GalleryController::class, 'removeLike'])
+        ->name('galleries.removeLike');
 });
 
-Route::get('/user/{username}', function (string $username) {
+Route::get('/user/{username}', function (string $username, Request $request) {
     $userExist = User::where('name', $username)->exists();
 
     if (!$userExist) {
@@ -84,12 +88,22 @@ Route::get('/user/{username}', function (string $username) {
     }
 
     $user = User::where('name', $username)->first();
+    $following = $request->user()->followees()->where('followee_id', $user->id)->exists();
+    $followersCount = $user->followers()->count();
 
     return Inertia::render('UserPage')->with([
         'galleries' => $user->galleries()->latest()->get(),
-        'username' => $user->name,
+        'profileUser' => $user,
+        'following' => $following,
+        'followersCount' => $followersCount,
     ]);
 })->name('user-page');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/following', [FollowController::class, 'index'])->name('following-page');
+    Route::post('/follow/{user}', [FollowController::class, 'follow'])->name('follow');
+    Route::post('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
+});
 
 require __DIR__ . '/auth.php';
 
@@ -115,7 +129,9 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
     $comments = $isGallery ? $gallery->comments()->get() : [];
-    $likes = $isGallery ? $gallery->likes()->latest()->get() : [];
+    $userLike = $isGallery ? $gallery->likes()->where('user_id', $request->user()->id)->first() : null;
+    $likesCount = $isGallery ? $gallery->likes()->where('liked', true)->count() : 0;
+    $dislikesCount = $isGallery ? $gallery->likes()->where('liked', false)->count() : 0;
 
     foreach ($images as $image) {
         $initImageUrl($image);
@@ -128,7 +144,9 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
         'gallery' => $gallery,
         'images' => $images,
         'comments' => $comments,
-        'likes' => $likes,
+        'userLike' => $userLike,
+        'likesCount' => $likesCount,
+        'dislikesCount' => $dislikesCount,
         'isFromCommunity' => $gallery->is_from_community ?? false,
         'editMode' => $editMode,
         'success' => $successMsg,
