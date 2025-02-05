@@ -86,15 +86,18 @@ Route::get('/user/{username}', function (string $username, Request $request) {
 
     $user = User::where('name', $username)->first();
     $following = $request->user()->followees()->where('followee_id', $user->id)->exists();
+    $followersCount = $user->followers()->count();
 
     return Inertia::render('UserPage')->with([
         'galleries' => $user->galleries()->latest()->get(),
         'profileUser' => $user,
         'following' => $following,
+        'followersCount' => $followersCount,
     ]);
 })->name('user-page');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
+    Route::get('/following', [FollowController::class, 'index'])->name('following-page');
     Route::post('/follow/{user}', [FollowController::class, 'follow'])->name('follow');
     Route::post('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
 });
