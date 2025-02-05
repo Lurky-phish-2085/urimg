@@ -1,23 +1,49 @@
 import Image from '@/Components/Image';
+import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
-import { GalleryData, ImageData, PageProps } from '@/types';
-import { Button } from '@headlessui/react';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    CommentData,
+    GalleryData,
+    ImageData,
+    LikeData,
+    PageProps,
+} from '@/types';
+import { Head, Link, router, useForm } from '@inertiajs/react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import {
+    ChangeEvent,
+    FormEvent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+
+dayjs.extend(relativeTime);
 
 export default function Gallery({
+    auth,
     gallery,
     images,
+    comments,
+    userLike,
+    likesCount,
+    dislikesCount,
+    isFromCommunity,
     editMode,
     success,
 }: PageProps<{
     gallery: GalleryData;
     images: ImageData[];
+    comments: CommentData[];
+    userLike: LikeData | null;
+    likesCount: number;
+    dislikesCount: number;
+    isFromCommunity: boolean;
     editMode: boolean;
     success: string;
 }>) {
-    const { auth } = usePage().props;
-
     const canEdit = useCallback((): boolean => {
         if (!auth.user) {
             return editMode;
@@ -66,9 +92,48 @@ export default function Gallery({
                 ) : (
                     <></>
                 )}
+                {isFromCommunity && (
+                    <div className="flex gap-2">
+                        <Link
+                            className={
+                                auth.user && userLike && userLike.liked
+                                    ? 'text-blue-500 underline'
+                                    : 'hover:underline'
+                            }
+                            as="button"
+                            method="post"
+                            href={
+                                auth.user && userLike && userLike.liked
+                                    ? route('galleries.removeLike', gallery.id)
+                                    : route('galleries.like', gallery.id)
+                            }
+                        >
+                            {'Like ' + likesCount}
+                        </Link>
+                        <Link
+                            className={
+                                auth.user && userLike && !userLike.liked
+                                    ? 'text-red-500 underline'
+                                    : 'hover:underline'
+                            }
+                            as="button"
+                            method="post"
+                            href={
+                                auth.user && userLike && !userLike.liked
+                                    ? route('galleries.removeLike', gallery.id)
+                                    : route('galleries.dislike', gallery.id)
+                            }
+                        >
+                            {'Dislike ' + dislikesCount}
+                        </Link>
+                    </div>
+                )}
                 {images.map((image) => (
                     <Image key={image.id} data={image} editMode={canEdit()} />
                 ))}
+                {isFromCommunity && (
+                    <CommentSection gallery={gallery} comments={comments} />
+                )}
             </div>
         </>
     );
@@ -171,5 +236,80 @@ function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
                 </Link>
             </div>
         </>
+    );
+}
+
+type CommentSectionProps = {
+    gallery: GalleryData;
+    comments: CommentData[];
+};
+
+function CommentSection({ gallery, comments }: CommentSectionProps) {
+    const { data, setData, processing, post, reset } = useForm<{
+        content: string;
+    }>({
+        content: '',
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        setData('content', e.target.value);
+    };
+
+    const submit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        post(route('comments.store', gallery.id), {
+            preserveScroll: true,
+            preserveState: true,
+        });
+        reset();
+    };
+
+    return (
+        <section className="border border-red-500 p-4">
+            <h1 className="text-xl">Comments</h1>
+            <form onSubmit={submit}>
+                <textarea
+                    placeholder="Type your comment here!"
+                    value={data.content}
+                    disabled={processing}
+                    onChange={handleChange}
+                ></textarea>
+                <Button type="submit" disabled={processing}>
+                    Comment
+                </Button>
+            </form>
+            {comments.map((comment) => (
+                <div key={comment.id} className="my-4 divide-y-2">
+                    <div className="flex items-center gap-2 text-slate-500">
+                        <small>
+                            <a
+                                href={route('user-page', comment.author_name)}
+                                className="underline hover:text-black"
+                            >
+                                {comment.author_name}
+                            </a>
+                            {comment.user_id === gallery.user_id && (
+                                <>
+                                    <span>&nbsp;</span>
+                                    <strong className="text-blue-500">
+                                        [ OP ]
+                                    </strong>
+                                </>
+                            )}
+                        </small>
+                        <div className="flex gap-1">
+                            <small>{dayjs(comment.created_at).fromNow()}</small>
+                            {comment.created_at !== comment.updated_at && (
+                                <>
+                                    <span>&middot;</span>
+                                    <small>edited</small>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <p>{comment.content}</p>
+                </div>
+            ))}
+        </section>
     );
 }
