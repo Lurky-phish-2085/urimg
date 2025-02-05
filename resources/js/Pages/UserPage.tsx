@@ -6,14 +6,19 @@ export default function UserPage({
     galleries,
     profileUser,
     following,
+    followersCount,
 }: PageProps<{
     galleries: GalleryData[];
     profileUser: User;
     following: boolean;
+    followersCount: number;
 }>) {
     return (
         <>
             <h1 className="text-xl">{`${profileUser.name}'s Galleries`}</h1>
+            <div>
+                <small>Followers: {followersCount}</small>
+            </div>
             {auth.user.id !== profileUser.id ? (
                 <Link
                     as="button"
