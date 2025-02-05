@@ -133,15 +133,6 @@ class GalleryController extends Controller implements HasMiddleware
         $user = $request->user();
         $gallery = Gallery::findOrFail($galleryId);
 
-        $liked = Like::where('user_id', $user->id)->where('liked', true)->first();
-        if ($liked) {
-            $liked->delete();
-
-            return redirect()->back()->with([
-                'success' => 'User successfully un-liked the post!',
-            ]);
-        }
-
         $gallery->likes()->updateOrCreate(
             ['user_id' => $user->id, 'liked' => false],
             ['liked' => true],
@@ -157,15 +148,6 @@ class GalleryController extends Controller implements HasMiddleware
         $user = $request->user();
         $gallery = Gallery::findOrFail($galleryId);
 
-        $disliked = Like::where('user_id', $user->id)->where('liked', false)->first();
-        if ($disliked) {
-            $disliked->delete();
-
-            return redirect()->back()->with([
-                'success' => 'User successfully un-disliked the post!',
-            ]);
-        }
-
         $gallery->likes()->updateOrCreate(
             ['user_id' => $user->id, 'liked' => true],
             ['liked' => false],
@@ -173,6 +155,22 @@ class GalleryController extends Controller implements HasMiddleware
 
         return redirect()->back()->with([
             'success' => 'User successfully disliked the post!',
+        ]);
+    }
+
+    public function removeLike(Request $request): RedirectResponse
+    {
+        $likeExists = Like::where('user_id', $request->user()->id)->exists();
+
+        if (!$likeExists) {
+            return redirect()->back();
+        }
+
+        $like = Like::where('user_id', $request->user()->id)->first();
+        $like->delete();
+
+        return redirect()->back()->with([
+            'success' => 'User successfully remove like!',
         ]);
     }
 }

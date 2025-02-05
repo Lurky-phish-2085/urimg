@@ -75,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/galleries/{galleryId}/dislike', [GalleryController::class, 'dislike'])
         ->name('galleries.dislike');
+
+    Route::post('/galleries/{galleryId}/removeLike', [GalleryController::class, 'removeLike'])
+        ->name('galleries.removeLike');
 });
 
 Route::get('/user/{username}', function (string $username, Request $request) {
@@ -126,7 +129,9 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
     $comments = $isGallery ? $gallery->comments()->get() : [];
-    $likes = $isGallery ? $gallery->likes()->latest()->get() : [];
+    $userLike = $isGallery ? $gallery->likes()->where('user_id', $request->user()->id)->first() : null;
+    $likesCount = $isGallery ? $gallery->likes()->where('liked', true)->count() : 0;
+    $dislikesCount = $isGallery ? $gallery->likes()->where('liked', false)->count() : 0;
 
     foreach ($images as $image) {
         $initImageUrl($image);
@@ -139,7 +144,9 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
         'gallery' => $gallery,
         'images' => $images,
         'comments' => $comments,
-        'likes' => $likes,
+        'userLike' => $userLike,
+        'likesCount' => $likesCount,
+        'dislikesCount' => $dislikesCount,
         'isFromCommunity' => $gallery->is_from_community ?? false,
         'editMode' => $editMode,
         'success' => $successMsg,
