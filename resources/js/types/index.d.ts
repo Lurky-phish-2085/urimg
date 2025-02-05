@@ -22,23 +22,6 @@ export interface ImageData extends Content {
     image_url: string;
 }
 
-export interface CommentData {
-    id: number;
-    user_id: number;
-    author_name: string;
-    content: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export interface LikeData {
-    id: number;
-    user_id: number;
-    liked: boolean;
-    created_at: string;
-    updated_at: string;
-}
-
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {

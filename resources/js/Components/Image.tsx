@@ -38,7 +38,6 @@ export default function Image({ data, editMode }: ImageProps) {
                         ref={inputRef1}
                         type="text"
                         placeholder="Title"
-                        value={title}
                         onBlur={submit}
                         onChange={(e) => {
                             setTitle(e.target.value);
@@ -66,7 +65,6 @@ export default function Image({ data, editMode }: ImageProps) {
                         type="text"
                         placeholder="Description"
                         onBlur={submit}
-                        value={description}
                         onChange={(e) => {
                             setDescription(e.target.value);
                             setData('description', e.target.value);
