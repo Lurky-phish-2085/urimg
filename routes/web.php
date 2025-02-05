@@ -75,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/galleries/{galleryId}/dislike', [GalleryController::class, 'dislike'])
         ->name('galleries.dislike');
+
+    Route::post('/galleries/{galleryId}/removeLike', [GalleryController::class, 'removeLike'])
+        ->name('galleries.removeLike');
 });
 
 Route::get('/user/{username}', function (string $username, Request $request) {
