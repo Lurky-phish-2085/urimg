@@ -8,7 +8,7 @@ import {
     LikeData,
     PageProps,
 } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {
@@ -23,10 +23,13 @@ import {
 dayjs.extend(relativeTime);
 
 export default function Gallery({
+    auth,
     gallery,
     images,
     comments,
-    likes,
+    userLike,
+    likesCount,
+    dislikesCount,
     isFromCommunity,
     editMode,
     success,
@@ -34,13 +37,13 @@ export default function Gallery({
     gallery: GalleryData;
     images: ImageData[];
     comments: CommentData[];
-    likes: LikeData[];
+    userLike: LikeData | null;
+    likesCount: number;
+    dislikesCount: number;
     isFromCommunity: boolean;
     editMode: boolean;
     success: string;
 }>) {
-    const { auth } = usePage().props;
-
     const canEdit = useCallback((): boolean => {
         if (!auth.user) {
             return editMode;
@@ -93,37 +96,35 @@ export default function Gallery({
                     <div className="flex gap-2">
                         <Link
                             className={
-                                auth.user &&
-                                likes.filter(
-                                    (v) =>
-                                        v.liked && v.user_id === auth.user.id,
-                                ).length !== 0
+                                auth.user && userLike && userLike.liked
                                     ? 'text-blue-500 underline'
-                                    : ''
+                                    : 'hover:underline'
                             }
                             as="button"
                             method="post"
-                            href={route('galleries.like', gallery.id)}
+                            href={
+                                auth.user && userLike && userLike.liked
+                                    ? route('galleries.removeLike', gallery.id)
+                                    : route('galleries.like', gallery.id)
+                            }
                         >
-                            {'Like ' +
-                                likes.filter((like) => like.liked).length}
+                            {'Like ' + likesCount}
                         </Link>
                         <Link
                             className={
-                                auth.user &&
-                                likes.filter(
-                                    (v) =>
-                                        !v.liked && v.user_id === auth.user.id,
-                                ).length !== 0
+                                auth.user && userLike && !userLike.liked
                                     ? 'text-red-500 underline'
-                                    : ''
+                                    : 'hover:underline'
                             }
                             as="button"
                             method="post"
-                            href={route('galleries.dislike', gallery.id)}
+                            href={
+                                auth.user && userLike && !userLike.liked
+                                    ? route('galleries.removeLike', gallery.id)
+                                    : route('galleries.dislike', gallery.id)
+                            }
                         >
-                            {'Dislike ' +
-                                likes.filter((like) => !like.liked).length}
+                            {'Dislike ' + dislikesCount}
                         </Link>
                     </div>
                 )}
