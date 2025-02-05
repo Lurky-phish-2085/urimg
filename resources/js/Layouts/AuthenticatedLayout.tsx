@@ -39,6 +39,12 @@ export default function Authenticated({
                                 >
                                     My Galleries
                                 </NavLink>
+                                <NavLink
+                                    href={route('following-page')}
+                                    active={route().current('following-page')}
+                                >
+                                    Following
+                                </NavLink>
                             </div>
                         </div>
 
@@ -148,6 +154,12 @@ export default function Authenticated({
                             active={route().current('galleries.index')}
                         >
                             My Galleries
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('following-page')}
+                            active={route().current('following-page')}
+                        >
+                            Following
                         </ResponsiveNavLink>
                     </div>
 
