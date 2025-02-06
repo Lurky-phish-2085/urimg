@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\GalleryController;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -65,7 +67,11 @@ Route::resource('galleries', GalleryController::class)
     ->only(['index', 'store', 'update', 'destroy']);
 
 Route::resource('images', ImageController::class)
-    ->only(['index', 'store', 'update', 'destroy']);
+    ->only(['store', 'update', 'destroy']);
+
+Route::resource('bookmarks', BookmarkController::class)
+    ->only(['index', 'store', 'update', 'destroy'])
+    ->middleware('auth');
 
 Route::post('/galleries/{galleryId}/comments', [CommentController::class, 'store'])
     ->middleware(['auth'])
@@ -131,9 +137,11 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     $isGallery = !is_null($gallery);
     $images = $isGallery ? $gallery->images()->get() : [$image];
     $comments = $isGallery ? $gallery->comments()->get() : [];
-    $userLike = $isGallery ? $gallery->likes()->where('user_id', $request->user()->id)->first() : null;
+    $userLike = Auth::user() && $isGallery ? $gallery->likes()->where('user_id', $request->user()->id)->first() : null;
     $likesCount = $isGallery ? $gallery->likes()->where('liked', true)->count() : 0;
     $dislikesCount = $isGallery ? $gallery->likes()->where('liked', false)->count() : 0;
+    $userBookmark = Auth::user() ? $request->user()->bookmarks()->where('content_retrieval_id', $retrieval_id)
+        ->first() : null;
 
     foreach ($images as $image) {
         $initImageUrl($image);
@@ -143,10 +151,13 @@ Route::get('/{retrieval_id}', function (Request $request, string $retrieval_id):
     }
 
     return Inertia::render('Gallery', [
+        'retrieval_id' => $retrieval_id,
         'gallery' => $gallery,
         'images' => $images,
         'comments' => $comments,
         'userLike' => $userLike,
+        'userBookmark' => $userBookmark,
+        'userBookmarked' => !is_null($userBookmark),
         'likesCount' => $likesCount,
         'dislikesCount' => $dislikesCount,
         'isFromCommunity' => $gallery->is_from_community ?? false,
