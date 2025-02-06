@@ -39,6 +39,11 @@ export interface LikeData {
     updated_at: string;
 }
 
+export interface BookmarkData {
+    id: number;
+    content_retrieval_id: string;
+}
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
