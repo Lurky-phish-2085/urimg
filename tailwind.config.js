@@ -26,7 +26,12 @@ export default {
         },
     },
 
-    plugins: [forms, require('tailwindcss-animate'), daisyui],
+    plugins: [
+        forms,
+        require('tailwindcss-animate'),
+        require('@tailwindcss/typography'),
+        daisyui,
+    ],
 
     daisyui: {
         themes: ['emerald', 'forest'], // false: only light + dark | true: all themes | array: specific themes like this ["light", "dark", "cupcake"]
