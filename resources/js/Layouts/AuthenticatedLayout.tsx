@@ -45,6 +45,12 @@ export default function Authenticated({
                                 >
                                     Following
                                 </NavLink>
+                                <NavLink
+                                    href={route('bookmarks.index')}
+                                    active={route().current('bookmarks.index')}
+                                >
+                                    My Bookmarks
+                                </NavLink>
                             </div>
                         </div>
 
@@ -160,6 +166,12 @@ export default function Authenticated({
                             active={route().current('following-page')}
                         >
                             Following
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('bookmarks.index')}
+                            active={route().current('bookmarks.index')}
+                        >
+                            My Bookmarks
                         </ResponsiveNavLink>
                     </div>
 
