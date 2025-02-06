@@ -2,6 +2,7 @@ import Image from '@/Components/Image';
 import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
 import {
+    BookmarkData,
     CommentData,
     GalleryData,
     ImageData,
@@ -24,20 +25,26 @@ dayjs.extend(relativeTime);
 
 export default function Gallery({
     auth,
+    retrieval_id,
     gallery,
     images,
     comments,
     userLike,
+    userBookmark,
+    userBookmarked,
     likesCount,
     dislikesCount,
     isFromCommunity,
     editMode,
     success,
 }: PageProps<{
+    retrieval_id: string;
     gallery: GalleryData;
     images: ImageData[];
     comments: CommentData[];
     userLike: LikeData | null;
+    userBookmark: BookmarkData;
+    userBookmarked: boolean;
     likesCount: number;
     dislikesCount: number;
     isFromCommunity: boolean;
@@ -126,6 +133,37 @@ export default function Gallery({
                         >
                             {'Dislike ' + dislikesCount}
                         </Link>
+                        <Button
+                            onClick={
+                                userBookmarked
+                                    ? () => {
+                                          router.delete(
+                                              route(
+                                                  'bookmarks.destroy',
+                                                  userBookmark.id,
+                                              ),
+                                          );
+                                      }
+                                    : () => {
+                                          router.post(
+                                              route('bookmarks.store'),
+                                              {
+                                                  content_retrieval_id:
+                                                      retrieval_id,
+                                              },
+                                          );
+                                      }
+                            }
+                            className={
+                                auth.user && userBookmarked
+                                    ? 'bg-blue-500'
+                                    : 'transition-all hover:bg-blue-400'
+                            }
+                        >
+                            {auth.user && userBookmarked
+                                ? 'Bookmarked'
+                                : 'Bookmark'}
+                        </Button>
                     </div>
                 )}
                 {images.map((image) => (
