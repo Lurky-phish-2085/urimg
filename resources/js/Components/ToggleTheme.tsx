@@ -18,10 +18,17 @@ export default function ToggleTheme() {
     const preferredColorScheme = usePrefersColorScheme();
 
     useEffect(() => {
-        setCurrentTheme(
+        const theme =
             localStorage.getItem('theme') ||
-                (preferredColorScheme === 'dark' ? darkTheme : lightTheme),
-        );
+            (preferredColorScheme === 'dark' ? darkTheme : lightTheme);
+
+        setCurrentTheme(theme);
+
+        if (theme === darkTheme) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     }, []);
 
     return (
