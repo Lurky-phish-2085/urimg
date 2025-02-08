@@ -1,3 +1,4 @@
+import ApplicationLogo from '@/Components/ApplicationLogo';
 import BaseHeaderNavBar from '@/Components/BaseHeaderNavBar';
 import ToggleTheme from '@/Components/ToggleTheme';
 import { usePage } from '@inertiajs/react';
@@ -76,11 +77,7 @@ function FooterContent() {
     return (
         <>
             <aside className="grid-flow-col items-center">
-                <div className="text-xl font-black">
-                    <span>ur</span>
-                    <span className="mr-1 italic">i</span>
-                    <span>mg</span>
-                </div>
+                <ApplicationLogo />
                 <p>
                     Made with 💖 by{' '}
                     <a
