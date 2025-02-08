@@ -1,14 +1,17 @@
 import { useForm } from '@inertiajs/react';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, PropsWithChildren } from 'react';
 
-type UploadImageFormProps = {
+interface UploadImageFormProps extends PropsWithChildren {
     href: string;
     galleryId?: number | null;
-};
+    inputHidden?: boolean;
+}
 
 export default function UploadImageForm({
+    children,
     href,
     galleryId = null,
+    inputHidden = false,
 }: UploadImageFormProps) {
     const { data, post, processing, errors } = useForm<{
         galleryId: number | null;
@@ -31,13 +34,15 @@ export default function UploadImageForm({
     return (
         <>
             <form>
-                <h1>Upload Image</h1>
                 <input
+                    id="input"
                     type="file"
                     accept="image/*"
                     disabled={processing}
                     onChange={handleChange}
+                    hidden={inputHidden}
                 />
+                {children}
                 <div>
                     <small className="text-red-500">{errors.image}</small>
                 </div>
