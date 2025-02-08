@@ -2,19 +2,28 @@ import { LabelHTMLAttributes } from 'react';
 
 export default function InputLabel({
     value,
+    errorMessage = '',
     className = '',
     children,
     ...props
-}: LabelHTMLAttributes<HTMLLabelElement> & { value?: string }) {
+}: LabelHTMLAttributes<HTMLLabelElement> & {
+    value?: string;
+    errorMessage?: string;
+}) {
     return (
         <label
             {...props}
-            className={
-                `block text-sm font-medium text-gray-700 dark:text-gray-300 ` +
-                className
-            }
+            className={`form-control w-full max-w-xs` + className}
         >
-            {value ? value : children}
+            <div className="label">
+                <span className="label-text">{value}</span>
+            </div>
+            {children}
+            <div className="label">
+                <span className="label-text-alt text-error">
+                    {errorMessage}
+                </span>
+            </div>
         </label>
     );
 }
