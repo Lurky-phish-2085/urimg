@@ -1,4 +1,5 @@
 import Image from '@/Components/Image';
+import Toast from '@/Components/Toast';
 import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
 import {
@@ -12,14 +13,7 @@ import {
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {
-    ChangeEvent,
-    FormEvent,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';
 
 dayjs.extend(relativeTime);
 
@@ -59,23 +53,6 @@ export default function Gallery({
         return auth.user.id ? auth.user.id === gallery.user_id : false;
     }, []);
 
-    useEffect(() => {
-        if (!success) return;
-        alert(success);
-    }, []);
-
-    useEffect(() => {
-        const removeListener = router.on('success', (e) => {
-            const successMsg = e.detail.page.props.success;
-            if (!successMsg) return;
-            alert(successMsg);
-        });
-
-        return () => {
-            removeListener();
-        };
-    }, [success]);
-
     return (
         <>
             <Head
@@ -85,6 +62,11 @@ export default function Gallery({
                         : `Gallery - ${gallery ? gallery.title || gallery.retrieval_id : images.at(0)?.retrieval_id}`
                 }
             ></Head>
+            <Toast
+                status="success"
+                message={success}
+                open={success ? true : false}
+            />
             <div className="flex flex-col gap-2 p-4">
                 {canEdit() ? (
                     <GalleryEditForm galleryData={gallery} />

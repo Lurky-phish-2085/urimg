@@ -1,21 +1,21 @@
+import Toast from '@/Components/Toast';
 import UploadImageForm from '@/Components/UploadImageForm';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
 
 export default function Welcome({
     success,
 }: PageProps<{ laravelVersion: string; phpVersion: string; success: string }>) {
-    useEffect(() => {
-        if (!success) return;
-        alert(success);
-    }, [success]);
-
     return (
         <>
             <Head title="Welcome"></Head>
             <GuestLayout className="mb-64 lg:mb-32">
+                <Toast
+                    status="success"
+                    message={success}
+                    open={success ? true : false}
+                />
                 <MainHeroSection />
                 <CommunityHeroSection />
             </GuestLayout>
