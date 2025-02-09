@@ -107,7 +107,10 @@ export default function Register() {
                                 />
                             </InputLabel>
                             <div className="card-actions mt-2">
-                                <button className="btn btn-primary">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary"
+                                >
                                     Register
                                 </button>
                                 <a
