@@ -39,6 +39,7 @@ export default function Register() {
                                 <TextInput
                                     id="name"
                                     name="name"
+                                    placeholder="Name"
                                     value={data.name}
                                     autoComplete="name"
                                     isFocused={true}
@@ -57,6 +58,7 @@ export default function Register() {
                                     id="email"
                                     type="email"
                                     name="email"
+                                    placeholder="Email"
                                     value={data.email}
                                     autoComplete="username"
                                     onChange={(e) =>
@@ -74,6 +76,7 @@ export default function Register() {
                                     id="password"
                                     type="password"
                                     name="password"
+                                    placeholder="Password"
                                     value={data.password}
                                     autoComplete="new-password"
                                     onChange={(e) =>
@@ -91,6 +94,7 @@ export default function Register() {
                                     id="password_confirmation"
                                     type="password"
                                     name="password_confirmation"
+                                    placeholder="Password Confirmation"
                                     value={data.password_confirmation}
                                     autoComplete="new-password"
                                     onChange={(e) =>
@@ -117,7 +121,7 @@ export default function Register() {
                             </div>
                         </form>
                         <div className="self-center md:w-1/2 md:text-center lg:w-1/2 lg:text-center">
-                            <ApplicationLogo className="mb-4 text-4xl" />
+                            <ApplicationLogo className="mb-4" />
                             <h1 className="text-xl font-bold">
                                 Join & Explore with the Community
                             </h1>
