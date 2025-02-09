@@ -41,13 +41,21 @@ function GuestHeaderNavBarContent() {
             ) : (
                 <>
                     <a
-                        className="btn btn-link text-base-content no-underline"
+                        className={
+                            route().current('login')
+                                ? 'btn btn-link'
+                                : 'btn btn-link text-base-content no-underline'
+                        }
                         href={route('login')}
                     >
                         Login
                     </a>
                     <a
-                        className="btn btn-link text-base-content no-underline"
+                        className={
+                            route().current('register')
+                                ? 'btn btn-link'
+                                : 'btn btn-link text-base-content no-underline'
+                        }
                         href={route('register')}
                     >
                         Register
