@@ -110,7 +110,7 @@ export default function Register() {
                                     className="btn btn-link"
                                     href={route('login')}
                                 >
-                                    <span className="font-normal transition-all hover:font-black">
+                                    <span className="font-normal">
                                         Already registered?
                                     </span>
                                 </a>
