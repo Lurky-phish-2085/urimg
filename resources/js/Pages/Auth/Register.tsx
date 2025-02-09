@@ -7,7 +7,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function Register() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, setError } = useForm({
         name: '',
         email: '',
         password: '',
@@ -43,9 +43,10 @@ export default function Register() {
                                     value={data.name}
                                     autoComplete="name"
                                     isFocused={true}
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setData('name', e.target.value);
+                                        setError('name', '');
+                                    }}
                                     required
                                 />
                             </InputLabel>
@@ -61,9 +62,10 @@ export default function Register() {
                                     placeholder="Email"
                                     value={data.email}
                                     autoComplete="username"
-                                    onChange={(e) =>
-                                        setData('email', e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setData('email', e.target.value);
+                                        setError('email', '');
+                                    }}
                                     required
                                 />
                             </InputLabel>
@@ -79,9 +81,10 @@ export default function Register() {
                                     placeholder="Password"
                                     value={data.password}
                                     autoComplete="new-password"
-                                    onChange={(e) =>
-                                        setData('password', e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        setData('password', e.target.value);
+                                        setError('password', '');
+                                    }}
                                     required
                                 />
                             </InputLabel>
@@ -97,12 +100,13 @@ export default function Register() {
                                     placeholder="Password Confirmation"
                                     value={data.password_confirmation}
                                     autoComplete="new-password"
-                                    onChange={(e) =>
+                                    onChange={(e) => {
                                         setData(
                                             'password_confirmation',
                                             e.target.value,
-                                        )
-                                    }
+                                        );
+                                        setError('password_confirmation', '');
+                                    }}
                                     required
                                 />
                             </InputLabel>
