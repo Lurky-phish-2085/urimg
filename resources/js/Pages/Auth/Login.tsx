@@ -107,7 +107,7 @@ export default function Login({
                                 )}
                             </div>
                         </form>
-                        <div className="md:w-1/2 md:text-center lg:w-1/2 lg:text-center">
+                        <div className="md:w-1/2 md:self-center md:text-center lg:w-1/2 lg:self-center lg:text-center">
                             <ApplicationLogo className="mb-4" />
                             <h1 className="text-xl font-bold">Welcome back!</h1>
                             <p className="py-6">
