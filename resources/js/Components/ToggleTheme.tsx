@@ -13,7 +13,7 @@ export default function ToggleTheme() {
     );
 
     const lightTheme = 'emerald';
-    const darkTheme = 'forest';
+    const darkTheme = 'dim';
 
     const preferredColorScheme = usePrefersColorScheme();
 
