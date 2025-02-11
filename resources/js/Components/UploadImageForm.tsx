@@ -2,6 +2,7 @@ import { useForm } from '@inertiajs/react';
 import { ChangeEvent, PropsWithChildren } from 'react';
 
 interface UploadImageFormProps extends PropsWithChildren {
+    className?: string;
     href: string;
     galleryId?: number | null;
     inputHidden?: boolean;
@@ -9,6 +10,7 @@ interface UploadImageFormProps extends PropsWithChildren {
 
 export default function UploadImageForm({
     children,
+    className = '',
     href,
     galleryId = null,
     inputHidden = false,
@@ -33,7 +35,7 @@ export default function UploadImageForm({
 
     return (
         <>
-            <form>
+            <form className={className}>
                 <input
                     id="input"
                     type="file"
