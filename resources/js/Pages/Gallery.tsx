@@ -73,7 +73,7 @@ export default function Gallery({
         return auth.user.id ? auth.user.id === gallery.user_id : false;
     }, []);
 
-    const [editing, setEditing] = useState(false);
+    const [editing, setEditing] = useState(editMode);
     const [isAsideFixed, setIsAsideFixed] = useState(true);
 
     const targetDivRef = useRef<HTMLDivElement | null>(null);
