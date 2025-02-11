@@ -1,7 +1,11 @@
-import Image from '@/Components/Image';
+import GalleryImage from '@/Components/GalleryImage';
+import InputLabel from '@/Components/InputLabel';
+import MyModal from '@/Components/MyModal';
+import TextArea from '@/Components/TextArea';
+import TextInput from '@/Components/TextInput';
 import Toast from '@/Components/Toast';
-import { Button } from '@/Components/ui/button';
 import UploadImageForm from '@/Components/UploadImageForm';
+import GuestLayout from '@/Layouts/GuestLayout';
 import {
     BookmarkData,
     CommentData,
@@ -10,10 +14,26 @@ import {
     LikeData,
     PageProps,
 } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { ChangeEvent, FormEvent, useCallback, useRef, useState } from 'react';
+import {
+    FormEvent,
+    KeyboardEvent,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+import {
+    AiFillDislike,
+    AiFillHeart,
+    AiFillLike,
+    AiOutlineDislike,
+    AiOutlineHeart,
+    AiOutlineLike,
+} from 'react-icons/ai';
+import { FaEdit } from 'react-icons/fa';
 
 dayjs.extend(relativeTime);
 
@@ -53,6 +73,31 @@ export default function Gallery({
         return auth.user.id ? auth.user.id === gallery.user_id : false;
     }, []);
 
+    const [editing, setEditing] = useState(false);
+    const [isAsideFixed, setIsAsideFixed] = useState(true);
+
+    const targetDivRef = useRef<HTMLDivElement | null>(null);
+
+    const handleScroll = () => {
+        const targetPosition = targetDivRef.current?.offsetHeight;
+
+        const reachedTargetPosition =
+            window.scrollY >= (targetPosition ? targetPosition : 0);
+
+        if (reachedTargetPosition) {
+            setIsAsideFixed(false);
+        } else {
+            setIsAsideFixed(true);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     return (
         <>
             <Head
@@ -62,109 +107,101 @@ export default function Gallery({
                         : `Gallery - ${gallery ? gallery.title || gallery.retrieval_id : images.at(0)?.retrieval_id}`
                 }
             ></Head>
-            <Toast
-                status="success"
-                message={success}
-                open={success ? true : false}
-            />
-            <div className="flex flex-col gap-2 p-4">
-                {canEdit() ? (
-                    <GalleryEditForm galleryData={gallery} />
-                ) : gallery ? (
-                    <>
-                        <h1 className="text-xl">
-                            {gallery.title || gallery.retrieval_id}
-                        </h1>
-                        <hr />
-                        <p>{gallery.description}</p>
-                    </>
-                ) : (
-                    <></>
-                )}
-                {isFromCommunity && (
-                    <div className="flex gap-2">
-                        <Link
-                            className={
-                                auth.user && userLike && userLike.liked
-                                    ? 'text-blue-500 underline'
-                                    : 'hover:underline'
-                            }
-                            as="button"
-                            method="post"
-                            href={
-                                auth.user && userLike && userLike.liked
-                                    ? route('galleries.removeLike', gallery.id)
-                                    : route('galleries.like', gallery.id)
-                            }
-                        >
-                            {'Like ' + likesCount}
-                        </Link>
-                        <Link
-                            className={
-                                auth.user && userLike && !userLike.liked
-                                    ? 'text-red-500 underline'
-                                    : 'hover:underline'
-                            }
-                            as="button"
-                            method="post"
-                            href={
-                                auth.user && userLike && !userLike.liked
-                                    ? route('galleries.removeLike', gallery.id)
-                                    : route('galleries.dislike', gallery.id)
-                            }
-                        >
-                            {'Dislike ' + dislikesCount}
-                        </Link>
-                        <Button
-                            onClick={
-                                userBookmarked
-                                    ? () => {
-                                          router.delete(
-                                              route(
-                                                  'bookmarks.destroy',
-                                                  userBookmark.id,
-                                              ),
-                                          );
-                                      }
-                                    : () => {
-                                          router.post(
-                                              route('bookmarks.store'),
-                                              {
-                                                  content_retrieval_id:
-                                                      retrieval_id,
-                                              },
-                                          );
-                                      }
-                            }
-                            className={
-                                auth.user && userBookmarked
-                                    ? 'bg-blue-500'
-                                    : 'transition-all hover:bg-blue-400'
-                            }
-                        >
-                            {auth.user && userBookmarked
-                                ? 'Bookmarked'
-                                : 'Bookmark'}
-                        </Button>
+            <GuestLayout hideFooter>
+                <Toast
+                    status="success"
+                    message={success}
+                    open={Boolean(success)}
+                />
+                <div className="flex flex-col p-4">
+                    {gallery ? (
+                        <>
+                            <aside
+                                className={
+                                    'hidden lg:block lg:w-96 ' +
+                                    (isAsideFixed
+                                        ? 'lg:fixed'
+                                        : 'top-72 lg:relative')
+                                }
+                            >
+                                {editing ? (
+                                    <GalleryEditForm
+                                        onDone={() => setEditing(false)}
+                                        galleryData={gallery}
+                                    />
+                                ) : (
+                                    <GalleryInfo
+                                        onEdit={() => setEditing(true)}
+                                        retrieval_id={retrieval_id}
+                                        data={gallery}
+                                        likesCount={likesCount}
+                                        dislikesCount={dislikesCount}
+                                        isFromCommunity={isFromCommunity}
+                                        userBookmark={userBookmark}
+                                        userBookmarked={userBookmarked}
+                                        userLike={userLike}
+                                    />
+                                )}
+                            </aside>
+                            {editing ? (
+                                <GalleryEditForm
+                                    onDone={() => setEditing(false)}
+                                    className="self-center lg:hidden"
+                                    galleryData={gallery}
+                                />
+                            ) : (
+                                <GalleryInfo
+                                    retrieval_id={retrieval_id}
+                                    onEdit={() => setEditing(true)}
+                                    className="lg:hidden"
+                                    data={gallery}
+                                    likesCount={likesCount}
+                                    dislikesCount={dislikesCount}
+                                    isFromCommunity={isFromCommunity}
+                                    userBookmark={userBookmark}
+                                    userBookmarked={userBookmarked}
+                                    userLike={userLike}
+                                />
+                            )}
+                        </>
+                    ) : (
+                        <></>
+                    )}
+                    <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
+                        {images.map((image) => (
+                            <GalleryImage
+                                key={image.id}
+                                data={image}
+                                editMode={canEdit()}
+                            />
+                        ))}
                     </div>
-                )}
-                {images.map((image) => (
-                    <Image key={image.id} data={image} editMode={canEdit()} />
-                ))}
-                {isFromCommunity && (
-                    <CommentSection gallery={gallery} comments={comments} />
-                )}
-            </div>
+                    {isFromCommunity && (
+                        <div ref={targetDivRef} className="mt-4">
+                            <CommentSection
+                                gallery={gallery}
+                                comments={comments}
+                            />
+                        </div>
+                    )}
+                </div>
+            </GuestLayout>
         </>
     );
 }
 
 type GalleryEditFormProps = {
+    className?: string;
     galleryData: GalleryData;
+    onDone: () => void;
 };
 
-function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
-    const { setData, patch, processing, errors } = useForm<{
+function GalleryEditForm({
+    className = '',
+    galleryData,
+    onDone = () => {},
+}: GalleryEditFormProps) {
+    const { setData, patch, errors, clearErrors } = useForm<{
         title: string;
         description: string;
     }>({
@@ -175,85 +212,177 @@ function GalleryEditForm({ galleryData }: GalleryEditFormProps) {
     const [title, setTitle] = useState(galleryData.title);
     const [description, setDescription] = useState(galleryData.description);
 
-    const inputRef1 = useRef<HTMLInputElement | null>(null);
-    const inputRef2 = useRef<HTMLInputElement | null>(null);
     const submit = () => {
         patch(route('galleries.update', galleryData.id), {
             preserveScroll: true,
             preserveState: true,
         });
-        inputRef1.current?.blur();
-        inputRef2.current?.blur();
+    };
+
+    const submitOnEnter = (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            submit();
+        }
     };
 
     return (
         <>
-            <div className="flex flex-col gap-2 p-2">
-                <h1>Edit Mode</h1>
+            <div className={className}>
                 <form
                     onSubmit={(e) => {
                         e.preventDefault();
                         submit();
                     }}
                 >
-                    <div className="flex flex-col gap-2">
-                        <input
-                            ref={inputRef1}
-                            onChange={(e) => {
-                                setTitle(e.target.value);
-                                setData('title', e.target.value);
-                            }}
-                            onBlur={submit}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    submit();
-                                }
-                            }}
-                            type="text"
-                            placeholder="Title"
-                            value={title}
-                            disabled={processing}
-                        />
-                        <small className="text-red-500">{errors.title}</small>
-                        <input
-                            ref={inputRef2}
-                            onChange={(e) => {
-                                setDescription(e.target.value);
-                                setData('description', e.target.value);
-                            }}
-                            onBlur={submit}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    submit();
-                                }
-                            }}
-                            type="text"
-                            placeholder="Description"
-                            value={description}
-                            disabled={processing}
-                        />
-                        <small className="text-red-500">
-                            {errors.description}
-                        </small>
-                        <Button
-                            className="hidden"
-                            type="submit"
-                            disabled={processing}
-                        >
-                            Save
-                        </Button>
+                    <div className="card block bg-base-100 lg:shadow-xl">
+                        <div className="card-body">
+                            <h2 className="card-title mb-4 md:mb-0 lg:mb-0">
+                                Edit Gallery
+                            </h2>
+                            <InputLabel
+                                htmlFor="title"
+                                value="Title"
+                                errorMessage={errors.title}
+                            >
+                                <TextInput
+                                    id="title"
+                                    type="text"
+                                    name="title"
+                                    placeholder="Title"
+                                    value={title}
+                                    className="mt-1 block w-full"
+                                    isFocused={true}
+                                    onBlur={submit}
+                                    onKeyDown={submitOnEnter}
+                                    onChange={(e) => {
+                                        setTitle(e.target.value);
+                                        setData('title', e.target.value);
+                                        clearErrors('title');
+                                    }}
+                                />
+                            </InputLabel>
+                            <InputLabel
+                                htmlFor="description"
+                                value="Description"
+                                errorMessage={errors.title}
+                            >
+                                <TextArea
+                                    id="description"
+                                    name="description"
+                                    placeholder="Description"
+                                    value={description}
+                                    className="mt-1 block w-full"
+                                    onBlur={submit}
+                                    onKeyDown={submitOnEnter}
+                                    onChange={(e) => {
+                                        setDescription(e.target.value);
+                                        setData('description', e.target.value);
+                                        clearErrors('description');
+                                    }}
+                                />
+                            </InputLabel>
+                            <div className="card-actions flex-wrap justify-around lg:justify-between">
+                                <UploadImageForm
+                                    href={route('images.store')}
+                                    galleryId={galleryData.id}
+                                    inputHidden
+                                >
+                                    <label
+                                        className="btn btn-primary"
+                                        htmlFor="input"
+                                    >
+                                        {/* Add image icon */}
+                                        <svg
+                                            width="32"
+                                            height="32"
+                                            viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <rect
+                                                x="0"
+                                                fill="none"
+                                                width="24"
+                                                height="24"
+                                            />
+
+                                            <g>
+                                                <path d="M23 4v2h-3v3h-2V6h-3V4h3V1h2v3h3zm-8.5 7c.828 0 1.5-.672 1.5-1.5S15.328 8 14.5 8 13 8.672 13 9.5s.672 1.5 1.5 1.5zm3.5 3.234l-.513-.57c-.794-.885-2.18-.885-2.976 0l-.655.73L9 9l-3 3.333V6h7V4H6c-1.105 0-2 .895-2 2v12c0 1.105.895 2 2 2h12c1.105 0 2-.895 2-2v-7h-2v3.234z" />
+                                            </g>
+                                        </svg>
+                                        Add Image
+                                    </label>
+                                </UploadImageForm>
+                                <MyModal
+                                    className="btn btn-error"
+                                    variant="prompt-danger"
+                                    title="Delete Gallery?"
+                                    message="This action cannot be undone."
+                                    acceptValue="Delete"
+                                    onAccept={() => {
+                                        router.delete(
+                                            route(
+                                                'galleries.destroy',
+                                                galleryData.id,
+                                            ),
+                                        );
+                                    }}
+                                >
+                                    {/* Delete icon */}
+                                    <svg
+                                        width="32"
+                                        height="32"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            d="M10 11V17"
+                                            stroke="#000000"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M14 11V17"
+                                            stroke="#000000"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M4 7H20"
+                                            stroke="#000000"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z"
+                                            stroke="#000000"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                        <path
+                                            d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                                            stroke="#000000"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                    Delete
+                                </MyModal>
+                                <button
+                                    onClick={onDone}
+                                    className="btn btn-block mt-4"
+                                >
+                                    Done
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </form>
-                <UploadImageForm
-                    href={route('images.store')}
-                    galleryId={galleryData.id}
-                />
-                <Link
-                    method="delete"
-                    href={route('galleries.destroy', galleryData.id)}
-                >
-                    Delete
-                </Link>
             </div>
         </>
     );
@@ -265,15 +394,12 @@ type CommentSectionProps = {
 };
 
 function CommentSection({ gallery, comments }: CommentSectionProps) {
-    const { data, setData, processing, post, reset } = useForm<{
-        content: string;
-    }>({
-        content: '',
-    });
-
-    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setData('content', e.target.value);
-    };
+    const { data, setData, processing, post, reset, errors, clearErrors } =
+        useForm<{
+            content: string;
+        }>({
+            content: '',
+        });
 
     const submit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -285,22 +411,33 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
     };
 
     return (
-        <section className="border border-red-500 p-4">
-            <h1 className="text-xl">Comments</h1>
+        <section>
             <form onSubmit={submit}>
-                <textarea
-                    placeholder="Type your comment here!"
-                    value={data.content}
+                <h2 className="text-2xl">Comments</h2>
+                <InputLabel htmlFor="comment" errorMessage={errors.content}>
+                    <TextArea
+                        id="comment"
+                        name="comment"
+                        placeholder="Type your comment here!"
+                        value={data.content}
+                        className="mt-1 block w-full"
+                        onChange={(e) => {
+                            setData('content', e.target.value);
+                            clearErrors('content');
+                        }}
+                    />
+                </InputLabel>
+                <button
+                    type="submit"
+                    className="btn btn-primary"
                     disabled={processing}
-                    onChange={handleChange}
-                ></textarea>
-                <Button type="submit" disabled={processing}>
+                >
                     Comment
-                </Button>
+                </button>
             </form>
             {comments.map((comment) => (
                 <div key={comment.id} className="my-4 divide-y-2">
-                    <div className="flex items-center gap-2 text-slate-500">
+                    <div className="flex items-center gap-2 text-base-content">
                         <small>
                             <a
                                 href={route('user-page', comment.author_name)}
@@ -311,7 +448,7 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
                             {comment.user_id === gallery.user_id && (
                                 <>
                                     <span>&nbsp;</span>
-                                    <strong className="text-blue-500">
+                                    <strong className="text-primary">
                                         [ OP ]
                                     </strong>
                                 </>
@@ -331,5 +468,157 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
                 </div>
             ))}
         </section>
+    );
+}
+
+type GalleryInfoProps = {
+    className?: string;
+    retrieval_id: string;
+    data: GalleryData;
+    userLike: LikeData | null;
+    userBookmark: BookmarkData;
+    userBookmarked: boolean;
+    likesCount: number;
+    dislikesCount: number;
+    isFromCommunity: boolean;
+    onEdit: () => void;
+};
+
+function GalleryInfo({
+    className,
+    data,
+    retrieval_id,
+    userLike,
+    userBookmark,
+    userBookmarked,
+    likesCount,
+    dislikesCount,
+    isFromCommunity,
+    onEdit,
+}: GalleryInfoProps) {
+    const { auth, editMode } =
+        usePage<PageProps<{ editMode: boolean }>>().props;
+
+    const canEdit = useCallback((): boolean => {
+        if (!auth.user) {
+            return editMode;
+        }
+
+        return auth.user.id ? auth.user.id === data.user_id : false;
+    }, []);
+
+    return (
+        <div className={'card block bg-base-100 lg:shadow-xl ' + className}>
+            <div className="card-body">
+                <div className="flex items-center">
+                    <h1 className="card-title text-4xl">
+                        {data.title || data.retrieval_id}
+                    </h1>
+                    {canEdit() && (
+                        <button
+                            onClick={onEdit}
+                            className="btn btn-ghost btn-sm"
+                        >
+                            <FaEdit />
+                        </button>
+                    )}
+                </div>
+                <hr />
+                <div className="prose mt-4">
+                    <p>{data.description}</p>
+                </div>
+            </div>
+            <div className="card-actions mb-2 justify-around md:justify-start lg:justify-start">
+                {isFromCommunity && (
+                    <>
+                        <div className="flex items-center justify-center gap-4 p-4">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={
+                                        userBookmarked
+                                            ? () => {
+                                                  router.delete(
+                                                      route(
+                                                          'bookmarks.destroy',
+                                                          userBookmark.id,
+                                                      ),
+                                                  );
+                                              }
+                                            : () => {
+                                                  router.post(
+                                                      route('bookmarks.store'),
+                                                      {
+                                                          content_retrieval_id:
+                                                              retrieval_id,
+                                                      },
+                                                  );
+                                              }
+                                    }
+                                    className={
+                                        'btn btn-ghost ' +
+                                        (auth.user && userBookmarked
+                                            ? 'text-red-400'
+                                            : '')
+                                    }
+                                >
+                                    {auth.user && userBookmarked ? (
+                                        <AiFillHeart />
+                                    ) : (
+                                        <AiOutlineHeart />
+                                    )}
+                                </button>
+                                <Link
+                                    className={'btn btn-ghost'}
+                                    as="button"
+                                    method="post"
+                                    href={
+                                        auth.user && userLike && userLike.liked
+                                            ? route(
+                                                  'galleries.removeLike',
+                                                  data.id,
+                                              )
+                                            : route('galleries.like', data.id)
+                                    }
+                                >
+                                    {auth.user && userLike && userLike.liked ? (
+                                        <AiFillLike />
+                                    ) : (
+                                        <AiOutlineLike />
+                                    )}
+                                </Link>
+                                <small>{likesCount}</small>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    className={'btn btn-ghost'}
+                                    as="button"
+                                    method="post"
+                                    href={
+                                        auth.user && userLike && !userLike.liked
+                                            ? route(
+                                                  'galleries.removeLike',
+                                                  data.id,
+                                              )
+                                            : route(
+                                                  'galleries.dislike',
+                                                  data.id,
+                                              )
+                                    }
+                                >
+                                    {auth.user &&
+                                    userLike &&
+                                    !userLike.liked ? (
+                                        <AiFillDislike />
+                                    ) : (
+                                        <AiOutlineDislike />
+                                    )}
+                                </Link>
+                                <small>{dislikesCount}</small>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
     );
 }

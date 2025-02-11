@@ -7,12 +7,13 @@ import { PropsWithChildren } from 'react';
 export default function GuestLayout({
     children,
     className = '',
-}: PropsWithChildren<{ className?: string }>) {
+    hideFooter = false,
+}: PropsWithChildren<{ className?: string; hideFooter?: boolean }>) {
     return (
         <>
             <GuestHeader />
             <Main className={className}>{children}</Main>
-            <Footer />
+            {hideFooter ? <></> : <Footer />}
         </>
     );
 }

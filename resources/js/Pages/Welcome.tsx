@@ -14,7 +14,7 @@ export default function Welcome({
                 <Toast
                     status="success"
                     message={success}
-                    open={success ? true : false}
+                    open={Boolean(success)}
                 />
                 <MainHeroSection />
                 <CommunityHeroSection />
