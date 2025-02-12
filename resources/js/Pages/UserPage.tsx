@@ -1,3 +1,4 @@
+import Authenticated from '@/Layouts/AuthenticatedLayout';
 import { GalleryData, PageProps, User } from '@/types';
 import { Link } from '@inertiajs/react';
 
@@ -14,7 +15,7 @@ export default function UserPage({
     followersCount: number;
 }>) {
     return (
-        <>
+        <Authenticated>
             <h1 className="text-xl">{`${profileUser.name}'s Galleries`}</h1>
             <div>
                 <small>Followers: {followersCount}</small>
@@ -44,8 +45,6 @@ export default function UserPage({
                         key={gallery.id}
                         className="my-2 block text-blue-500 underline"
                         href={route('gallery', gallery.retrieval_id)}
-                        target="_noblank"
-                        rel="noopenner noreferrer"
                     >
                         {gallery.title || gallery.retrieval_id}
                     </a>
@@ -53,6 +52,6 @@ export default function UserPage({
             ) : (
                 <h2 className="text-lg">Nothing's here...</h2>
             )}
-        </>
+        </Authenticated>
     );
 }
