@@ -8,7 +8,7 @@ import { TbBroadcast } from 'react-icons/tb';
 
 export default function Authenticated({
     children,
-    className = '',
+    className = 'mb-36 lg:mb-16',
 }: PropsWithChildren<{ className?: string }>) {
     return (
         <>
