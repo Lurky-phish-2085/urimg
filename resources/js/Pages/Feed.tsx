@@ -1,3 +1,4 @@
+import ContentList from '@/Components/ContentList';
 import UploadImageForm from '@/Components/UploadImageForm';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { GalleryData, PageProps } from '@/types';
@@ -8,15 +9,7 @@ export default function Feed({
     return (
         <AuthenticatedLayout>
             <UploadImageForm href={route('galleries.store')} />
-            {galleries.map((gallery) => (
-                <a
-                    key={gallery.id}
-                    className="my-2 block text-blue-500 underline"
-                    href={route('gallery', gallery.retrieval_id)}
-                >
-                    {gallery.title || gallery.retrieval_id}
-                </a>
-            ))}
+            <ContentList galleries={galleries} />
         </AuthenticatedLayout>
     );
 }

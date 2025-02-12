@@ -1,3 +1,4 @@
+import ContentList from '@/Components/ContentList';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import { GalleryData, PageProps, User } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -40,15 +41,7 @@ export default function UserPage({
                 <></>
             )}
             {galleries.length > 0 ? (
-                galleries.map((gallery) => (
-                    <a
-                        key={gallery.id}
-                        className="my-2 block text-blue-500 underline"
-                        href={route('gallery', gallery.retrieval_id)}
-                    >
-                        {gallery.title || gallery.retrieval_id}
-                    </a>
-                ))
+                <ContentList galleries={galleries} />
             ) : (
                 <h2 className="text-lg">Nothing's here...</h2>
             )}
