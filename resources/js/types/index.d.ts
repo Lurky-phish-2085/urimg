@@ -16,6 +16,7 @@ export interface Content {
 
 export interface GalleryData extends Content {
     user_id: number;
+    thumbnail_url: string;
 }
 
 export interface ImageData extends Content {

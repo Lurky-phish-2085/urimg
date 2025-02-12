@@ -34,6 +34,13 @@ class Gallery extends Model
         );
     }
 
+    protected function thumbnailUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn(): string => $this->images()->get()->first()->image_url
+        );
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -29,6 +29,10 @@ class GalleryController extends Controller implements HasMiddleware
     {
         $galleries = $request->user()->galleries()->latest()->get();
 
+        foreach ($galleries as $gallery) {
+            $gallery->thumbnail_url = $gallery->thumbnail_url;
+        }
+
         return Inertia::render('MyGalleries', [
             'galleries' => $galleries
         ]);
