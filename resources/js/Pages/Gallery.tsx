@@ -5,6 +5,7 @@ import TextArea from '@/Components/TextArea';
 import TextInput from '@/Components/TextInput';
 import Toast from '@/Components/Toast';
 import UploadImageForm from '@/Components/UploadImageForm';
+import Authenticated from '@/Layouts/AuthenticatedLayout';
 import GuestLayout from '@/Layouts/GuestLayout';
 import {
     BookmarkData,
@@ -107,32 +108,54 @@ export default function Gallery({
                         : `Gallery - ${gallery ? gallery.title || gallery.retrieval_id : images.at(0)?.retrieval_id}`
                 }
             ></Head>
-            <GuestLayout hideFooter>
-                <Toast
-                    status="success"
-                    message={success}
-                    open={Boolean(success)}
-                />
-                <div className="flex flex-col p-4">
-                    {gallery ? (
-                        <>
-                            <aside
-                                className={
-                                    'hidden lg:block lg:w-96 ' +
-                                    (isAsideFixed
-                                        ? 'lg:fixed'
-                                        : 'top-72 lg:relative')
-                                }
-                            >
+            {auth.user ? (
+                <Authenticated>
+                    <Toast
+                        status="success"
+                        message={success}
+                        open={Boolean(success)}
+                    />
+                    <div className="flex flex-col p-4">
+                        {gallery ? (
+                            <>
+                                <aside
+                                    className={
+                                        'hidden lg:block lg:w-96 ' +
+                                        (isAsideFixed
+                                            ? 'lg:fixed'
+                                            : 'top-72 lg:relative')
+                                    }
+                                >
+                                    {editing ? (
+                                        <GalleryEditForm
+                                            onDone={() => setEditing(false)}
+                                            galleryData={gallery}
+                                        />
+                                    ) : (
+                                        <GalleryInfo
+                                            onEdit={() => setEditing(true)}
+                                            retrieval_id={retrieval_id}
+                                            data={gallery}
+                                            likesCount={likesCount}
+                                            dislikesCount={dislikesCount}
+                                            isFromCommunity={isFromCommunity}
+                                            userBookmark={userBookmark}
+                                            userBookmarked={userBookmarked}
+                                            userLike={userLike}
+                                        />
+                                    )}
+                                </aside>
                                 {editing ? (
                                     <GalleryEditForm
                                         onDone={() => setEditing(false)}
+                                        className="self-center lg:hidden"
                                         galleryData={gallery}
                                     />
                                 ) : (
                                     <GalleryInfo
-                                        onEdit={() => setEditing(true)}
                                         retrieval_id={retrieval_id}
+                                        onEdit={() => setEditing(true)}
+                                        className="lg:hidden"
                                         data={gallery}
                                         likesCount={likesCount}
                                         dislikesCount={dislikesCount}
@@ -142,50 +165,110 @@ export default function Gallery({
                                         userLike={userLike}
                                     />
                                 )}
-                            </aside>
-                            {editing ? (
-                                <GalleryEditForm
-                                    onDone={() => setEditing(false)}
-                                    className="self-center lg:hidden"
-                                    galleryData={gallery}
+                            </>
+                        ) : (
+                            <></>
+                        )}
+                        <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
+                            {images.map((image) => (
+                                <GalleryImage
+                                    key={image.id}
+                                    data={image}
+                                    editMode={canEdit()}
                                 />
-                            ) : (
-                                <GalleryInfo
-                                    retrieval_id={retrieval_id}
-                                    onEdit={() => setEditing(true)}
-                                    className="lg:hidden"
-                                    data={gallery}
-                                    likesCount={likesCount}
-                                    dislikesCount={dislikesCount}
-                                    isFromCommunity={isFromCommunity}
-                                    userBookmark={userBookmark}
-                                    userBookmarked={userBookmarked}
-                                    userLike={userLike}
-                                />
-                            )}
-                        </>
-                    ) : (
-                        <></>
-                    )}
-                    <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
-                        {images.map((image) => (
-                            <GalleryImage
-                                key={image.id}
-                                data={image}
-                                editMode={canEdit()}
-                            />
-                        ))}
-                    </div>
-                    {isFromCommunity && (
-                        <div ref={targetDivRef} className="mt-4">
-                            <CommentSection
-                                gallery={gallery}
-                                comments={comments}
-                            />
+                            ))}
                         </div>
-                    )}
-                </div>
-            </GuestLayout>
+                        {isFromCommunity && (
+                            <div ref={targetDivRef} className="mt-4">
+                                <CommentSection
+                                    gallery={gallery}
+                                    comments={comments}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </Authenticated>
+            ) : (
+                <GuestLayout hideFooter>
+                    <Toast
+                        status="success"
+                        message={success}
+                        open={Boolean(success)}
+                    />
+                    <div className="flex flex-col p-4">
+                        {gallery ? (
+                            <>
+                                <aside
+                                    className={
+                                        'hidden lg:block lg:w-96 ' +
+                                        (isAsideFixed
+                                            ? 'lg:fixed'
+                                            : 'top-72 lg:relative')
+                                    }
+                                >
+                                    {editing ? (
+                                        <GalleryEditForm
+                                            onDone={() => setEditing(false)}
+                                            galleryData={gallery}
+                                        />
+                                    ) : (
+                                        <GalleryInfo
+                                            onEdit={() => setEditing(true)}
+                                            retrieval_id={retrieval_id}
+                                            data={gallery}
+                                            likesCount={likesCount}
+                                            dislikesCount={dislikesCount}
+                                            isFromCommunity={isFromCommunity}
+                                            userBookmark={userBookmark}
+                                            userBookmarked={userBookmarked}
+                                            userLike={userLike}
+                                        />
+                                    )}
+                                </aside>
+                                {editing ? (
+                                    <GalleryEditForm
+                                        onDone={() => setEditing(false)}
+                                        className="self-center lg:hidden"
+                                        galleryData={gallery}
+                                    />
+                                ) : (
+                                    <GalleryInfo
+                                        retrieval_id={retrieval_id}
+                                        onEdit={() => setEditing(true)}
+                                        className="lg:hidden"
+                                        data={gallery}
+                                        likesCount={likesCount}
+                                        dislikesCount={dislikesCount}
+                                        isFromCommunity={isFromCommunity}
+                                        userBookmark={userBookmark}
+                                        userBookmarked={userBookmarked}
+                                        userLike={userLike}
+                                    />
+                                )}
+                            </>
+                        ) : (
+                            <></>
+                        )}
+                        <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
+                            {images.map((image) => (
+                                <GalleryImage
+                                    key={image.id}
+                                    data={image}
+                                    editMode={canEdit()}
+                                />
+                            ))}
+                        </div>
+                        {isFromCommunity && (
+                            <div ref={targetDivRef} className="mt-4">
+                                <CommentSection
+                                    gallery={gallery}
+                                    comments={comments}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </GuestLayout>
+            )}
         </>
     );
 }
@@ -562,9 +645,9 @@ function GalleryInfo({
                                     }
                                 >
                                     {auth.user && userBookmarked ? (
-                                        <AiFillHeart />
+                                        <AiFillHeart className="h-5 w-5" />
                                     ) : (
-                                        <AiOutlineHeart />
+                                        <AiOutlineHeart className="h-5 w-5" />
                                     )}
                                 </button>
                                 <Link
@@ -581,9 +664,9 @@ function GalleryInfo({
                                     }
                                 >
                                     {auth.user && userLike && userLike.liked ? (
-                                        <AiFillLike />
+                                        <AiFillLike className="h-5 w-5" />
                                     ) : (
-                                        <AiOutlineLike />
+                                        <AiOutlineLike className="h-5 w-5" />
                                     )}
                                 </Link>
                                 <small>{likesCount}</small>
@@ -608,9 +691,9 @@ function GalleryInfo({
                                     {auth.user &&
                                     userLike &&
                                     !userLike.liked ? (
-                                        <AiFillDislike />
+                                        <AiFillDislike className="h-5 w-5" />
                                     ) : (
-                                        <AiOutlineDislike />
+                                        <AiOutlineDislike className="h-5 w-5" />
                                     )}
                                 </Link>
                                 <small>{dislikesCount}</small>
