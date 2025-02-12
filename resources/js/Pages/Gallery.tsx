@@ -1,3 +1,5 @@
+import CopyClipboardButton from '@/Components/CopyClipboardButton';
+import CopyLinkButton from '@/Components/CopyLinkButton';
 import GalleryImage from '@/Components/GalleryImage';
 import InputLabel from '@/Components/InputLabel';
 import MyModal from '@/Components/MyModal';
@@ -34,6 +36,7 @@ import {
     AiOutlineHeart,
     AiOutlineLike,
 } from 'react-icons/ai';
+import { BiLink } from 'react-icons/bi';
 import { FaEdit } from 'react-icons/fa';
 
 dayjs.extend(relativeTime);
@@ -67,6 +70,9 @@ export default function Gallery({
     success: string;
 }>) {
     const canEdit = useCallback((): boolean => {
+        if (!gallery) {
+            return false;
+        }
         if (!auth.user) {
             return editMode;
         }
@@ -612,7 +618,7 @@ function GalleryInfo({
                 </div>
             </div>
             <div className="card-actions mb-2 justify-around md:justify-start lg:justify-start">
-                {isFromCommunity && (
+                {isFromCommunity ? (
                     <>
                         <div className="flex items-center justify-center gap-4 p-4">
                             <div className="flex items-center gap-2">
@@ -698,8 +704,64 @@ function GalleryInfo({
                                 </Link>
                                 <small>{dislikesCount}</small>
                             </div>
+                            <CopyClipboardButton
+                                valueToCopy={route('home') + `/${retrieval_id}`}
+                                defaultContent={<BiLink className="h-5 w-5" />}
+                                successContent={
+                                    <BiLink className="h-5 w-5 text-primary" />
+                                }
+                            />
                         </div>
                     </>
+                ) : (
+                    <div className="flex items-center justify-center gap-4 p-4">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    router.post(route('bookmarks.store'), {
+                                        content_retrieval_id: retrieval_id,
+                                    });
+                                }}
+                                className="btn btn-ghost"
+                            >
+                                <AiOutlineHeart className="h-5 w-5" />
+                            </button>
+                            {isFromCommunity && (
+                                <>
+                                    <Link
+                                        className={'btn btn-ghost'}
+                                        as="button"
+                                        method="post"
+                                        href={route('galleries.like', data.id)}
+                                    >
+                                        <AiOutlineLike className="h-5 w-5" />
+                                    </Link>
+                                    <small>{likesCount}</small>
+                                </>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isFromCommunity && (
+                                <>
+                                    <Link
+                                        className={'btn btn-ghost'}
+                                        as="button"
+                                        method="post"
+                                        href={route(
+                                            'galleries.dislike',
+                                            data.id,
+                                        )}
+                                    >
+                                        <AiOutlineDislike className="h-5 w-5" />
+                                    </Link>
+                                    <small>{dislikesCount}</small>
+                                </>
+                            )}
+                        </div>
+                        <CopyLinkButton
+                            value={`${route('home')}/${retrieval_id}`}
+                        />
+                    </div>
                 )}
             </div>
         </div>
