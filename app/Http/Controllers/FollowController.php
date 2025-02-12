@@ -21,6 +21,10 @@ class FollowController extends Controller
             ->latest()
             ->get();
 
+        foreach ($followeeGalleries as $gallery) {
+            $gallery->thumbnail_url = $gallery->thumbnail_url;
+        }
+
         return Inertia::render('Following')->with([
             'galleries' => $followeeGalleries
         ]);

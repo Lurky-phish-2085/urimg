@@ -54,6 +54,10 @@ Route::get('/', function (Request $request) {
 Route::get('/feed', function () {
     $galleries = Gallery::with('user')->latest()->get();
 
+    foreach ($galleries as $gallery) {
+        $gallery->thumbnail_url = $gallery->thumbnail_url;
+    }
+
     return Inertia::render('Feed')->with(compact('galleries'));
 })->middleware(['auth', 'verified'])->name('feed');
 
