@@ -2,6 +2,7 @@ import { ImageData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { KeyboardEvent, useRef, useState } from 'react';
 import { FaEdit } from 'react-icons/fa';
+import CopyLinkButton from './CopyLinkButton';
 import InputLabel from './InputLabel';
 import TextArea from './TextArea';
 import TextInput from './TextInput';
@@ -111,6 +112,10 @@ export default function GalleryImage({ data, editMode }: ImageProps) {
                                     <FaEdit />
                                 </button>
                             )}
+                            <CopyLinkButton
+                                className="btn-sm ml-auto"
+                                value={`${route('home')}/${data.retrieval_id}`}
+                            />
                         </div>
                         <hr />
                         <div className="prose">
