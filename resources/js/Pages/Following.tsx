@@ -7,7 +7,7 @@ export default function Following({
 }: PageProps<{ galleries: GalleryData[] }>) {
     return (
         <>
-            <Authenticated>
+            <Authenticated pageTitle="Following">
                 {galleries.length > 0 ? (
                     <ContentList galleries={galleries} />
                 ) : (

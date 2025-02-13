@@ -8,11 +8,13 @@ import { TbBroadcast } from 'react-icons/tb';
 
 export default function Authenticated({
     children,
+    pageTitle = '',
     className = 'mb-36 lg:mb-16',
-}: PropsWithChildren<{ className?: string }>) {
+}: PropsWithChildren<{ className?: string; pageTitle?: string }>) {
     return (
         <>
             <AuthHeader />
+            {pageTitle && <PageTitle title={pageTitle} />}
             <Main className={className}>{children}</Main>
             <BottomNav />
         </>
@@ -24,6 +26,61 @@ function AuthHeader() {
         <BaseHeaderNavBar>
             <AuthHeaderNavBarContent />
         </BaseHeaderNavBar>
+    );
+}
+
+function PageTitle({ title }: { title: string }) {
+    return (
+        <section className="mx-2 my-4 text-2xl font-semibold">
+            {title} <hr />
+        </section>
+    );
+}
+
+function Main({
+    children,
+    className = '',
+}: PropsWithChildren<{ className?: string }>) {
+    return <main className={`min-h-screen ${className}`}>{children}</main>;
+}
+
+function BottomNav() {
+    return (
+        <div className="block md:hidden">
+            <div className="btm-nav">
+                <button
+                    className={route().current('feed') ? 'active' : ''}
+                    onClick={() => {
+                        router.get(route('feed'));
+                    }}
+                >
+                    <AiOutlineHome className="h-5 w-5" />
+                    <span className="btm-nav-label">Home</span>
+                </button>
+                <button
+                    className={
+                        route().current('following-page') ? 'active' : ''
+                    }
+                    onClick={() => {
+                        router.get(route('following-page'));
+                    }}
+                >
+                    <TbBroadcast className="h-5 w-5" />
+                    <span className="btm-nav-label">Following</span>
+                </button>
+                <button
+                    className={
+                        route().current('bookmarks.index') ? 'active' : ''
+                    }
+                    onClick={() => {
+                        router.get(route('bookmarks.index'));
+                    }}
+                >
+                    <BiBookBookmark className="h-5 w-5" />
+                    <span className="btm-nav-label">Bookmarks</span>
+                </button>
+            </div>
+        </div>
     );
 }
 
@@ -111,52 +168,5 @@ function AuthHeaderNavBarContent() {
                 </div>
             </div>
         </>
-    );
-}
-
-function Main({
-    children,
-    className = '',
-}: PropsWithChildren<{ className?: string }>) {
-    return <main className={`min-h-screen ${className}`}>{children}</main>;
-}
-
-function BottomNav() {
-    return (
-        <div className="block md:hidden">
-            <div className="btm-nav">
-                <button
-                    className={route().current('feed') ? 'active' : ''}
-                    onClick={() => {
-                        router.get(route('feed'));
-                    }}
-                >
-                    <AiOutlineHome className="h-5 w-5" />
-                    <span className="btm-nav-label">Home</span>
-                </button>
-                <button
-                    className={
-                        route().current('following-page') ? 'active' : ''
-                    }
-                    onClick={() => {
-                        router.get(route('following-page'));
-                    }}
-                >
-                    <TbBroadcast className="h-5 w-5" />
-                    <span className="btm-nav-label">Following</span>
-                </button>
-                <button
-                    className={
-                        route().current('bookmarks.index') ? 'active' : ''
-                    }
-                    onClick={() => {
-                        router.get(route('bookmarks.index'));
-                    }}
-                >
-                    <BiBookBookmark className="h-5 w-5" />
-                    <span className="btm-nav-label">Bookmarks</span>
-                </button>
-            </div>
-        </div>
     );
 }

@@ -5,7 +5,7 @@ export default function Bookmarks({
     bookmarks,
 }: PageProps<{ bookmarks: BookmarkData[] }>) {
     return (
-        <Authenticated>
+        <Authenticated pageTitle="Bookmarks">
             {bookmarks.length > 0 ? (
                 bookmarks.map((bookmark) => (
                     <a
