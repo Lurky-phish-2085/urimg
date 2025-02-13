@@ -52,7 +52,7 @@ Route::get('/', function (Request $request) {
 })->name('home')->middleware('guest');
 
 Route::get('/feed', function () {
-    $galleries = Gallery::with('user')->latest()->get();
+    $galleries = Gallery::whereNotNull('user_id')->latest()->get();
 
     foreach ($galleries as $gallery) {
         $gallery->thumbnail_url = $gallery->thumbnail_url;
