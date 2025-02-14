@@ -20,14 +20,7 @@ import {
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import {
-    FormEvent,
-    KeyboardEvent,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { FormEvent, KeyboardEvent, useCallback, useState } from 'react';
 import {
     AiFillDislike,
     AiFillHeart,
@@ -81,29 +74,6 @@ export default function Gallery({
     }, []);
 
     const [editing, setEditing] = useState(editMode);
-    const [isAsideFixed, setIsAsideFixed] = useState(true);
-
-    const targetDivRef = useRef<HTMLDivElement | null>(null);
-
-    const handleScroll = () => {
-        const targetPosition = targetDivRef.current?.offsetHeight;
-
-        const reachedTargetPosition =
-            window.scrollY >= (targetPosition ? targetPosition : 0);
-
-        if (reachedTargetPosition) {
-            setIsAsideFixed(false);
-        } else {
-            setIsAsideFixed(true);
-        }
-    };
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
 
     return (
         <>
@@ -121,15 +91,12 @@ export default function Gallery({
                         message={success}
                         open={Boolean(success)}
                     />
-                    <div className="flex flex-col p-4">
-                        {gallery ? (
-                            <>
+                    <div className="p-4">
+                        <div className="flex flex-col">
+                            {gallery ? (
                                 <aside
                                     className={
-                                        'hidden lg:block lg:w-96 ' +
-                                        (isAsideFixed
-                                            ? 'lg:fixed'
-                                            : 'top-72 lg:relative')
+                                        'hidden md:block lg:sticky lg:left-0 lg:top-28 lg:mb-10 lg:w-96'
                                     }
                                 >
                                     {editing ? (
@@ -151,41 +118,21 @@ export default function Gallery({
                                         />
                                     )}
                                 </aside>
-                                {editing ? (
-                                    <GalleryEditForm
-                                        onDone={() => setEditing(false)}
-                                        className="self-center lg:hidden"
-                                        galleryData={gallery}
+                            ) : (
+                                <></>
+                            )}
+                            <div className="flex flex-col items-center gap-12 lg:-mt-80 lg:ml-auto lg:mr-36 lg:w-96 lg:only:mx-auto lg:only:mt-0 xl:mx-auto xl:w-96">
+                                {images.map((image) => (
+                                    <GalleryImage
+                                        key={image.id}
+                                        data={image}
+                                        editMode={canEdit()}
                                     />
-                                ) : (
-                                    <GalleryInfo
-                                        retrieval_id={retrieval_id}
-                                        onEdit={() => setEditing(true)}
-                                        className="lg:hidden"
-                                        data={gallery}
-                                        likesCount={likesCount}
-                                        dislikesCount={dislikesCount}
-                                        isFromCommunity={isFromCommunity}
-                                        userBookmark={userBookmark}
-                                        userBookmarked={userBookmarked}
-                                        userLike={userLike}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <></>
-                        )}
-                        <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
-                            {images.map((image) => (
-                                <GalleryImage
-                                    key={image.id}
-                                    data={image}
-                                    editMode={canEdit()}
-                                />
-                            ))}
+                                ))}
+                            </div>
                         </div>
                         {isFromCommunity && (
-                            <div ref={targetDivRef} className="mt-4">
+                            <div className="mt-4">
                                 <CommentSection
                                     gallery={gallery}
                                     comments={comments}
@@ -201,15 +148,17 @@ export default function Gallery({
                         message={success}
                         open={Boolean(success)}
                     />
-                    <div className="flex flex-col p-4">
-                        {gallery ? (
-                            <>
+                    <Toast
+                        status="success"
+                        message={success}
+                        open={Boolean(success)}
+                    />
+                    <div className="p-4">
+                        <div className="flex flex-col">
+                            {gallery ? (
                                 <aside
                                     className={
-                                        'hidden lg:block lg:w-96 ' +
-                                        (isAsideFixed
-                                            ? 'lg:fixed'
-                                            : 'top-72 lg:relative')
+                                        'hidden md:block lg:sticky lg:left-0 lg:top-28 lg:mb-10 lg:w-96'
                                     }
                                 >
                                     {editing ? (
@@ -231,41 +180,21 @@ export default function Gallery({
                                         />
                                     )}
                                 </aside>
-                                {editing ? (
-                                    <GalleryEditForm
-                                        onDone={() => setEditing(false)}
-                                        className="self-center lg:hidden"
-                                        galleryData={gallery}
+                            ) : (
+                                <></>
+                            )}
+                            <div className="flex flex-col items-center gap-12 lg:-mt-80 lg:ml-auto lg:mr-36 lg:w-96 lg:only:mx-auto lg:only:mt-0 xl:mx-auto xl:w-96">
+                                {images.map((image) => (
+                                    <GalleryImage
+                                        key={image.id}
+                                        data={image}
+                                        editMode={canEdit()}
                                     />
-                                ) : (
-                                    <GalleryInfo
-                                        retrieval_id={retrieval_id}
-                                        onEdit={() => setEditing(true)}
-                                        className="lg:hidden"
-                                        data={gallery}
-                                        likesCount={likesCount}
-                                        dislikesCount={dislikesCount}
-                                        isFromCommunity={isFromCommunity}
-                                        userBookmark={userBookmark}
-                                        userBookmarked={userBookmarked}
-                                        userLike={userLike}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <></>
-                        )}
-                        <div className="flex flex-col items-center gap-12 lg:ml-auto lg:w-96 xl:mx-auto xl:w-96">
-                            {images.map((image) => (
-                                <GalleryImage
-                                    key={image.id}
-                                    data={image}
-                                    editMode={canEdit()}
-                                />
-                            ))}
+                                ))}
+                            </div>
                         </div>
                         {isFromCommunity && (
-                            <div ref={targetDivRef} className="mt-4">
+                            <div className="mt-4">
                                 <CommentSection
                                     gallery={gallery}
                                     comments={comments}
@@ -500,7 +429,7 @@ function CommentSection({ gallery, comments }: CommentSectionProps) {
     };
 
     return (
-        <section>
+        <section className="border-t-2">
             <form onSubmit={submit}>
                 <h2 className="text-2xl">Comments</h2>
                 <InputLabel htmlFor="comment" errorMessage={errors.content}>
@@ -597,7 +526,7 @@ function GalleryInfo({
     }, []);
 
     return (
-        <div className={'card block bg-base-100 lg:shadow-xl ' + className}>
+        <div className={'card block bg-base-100 lg:shadow-md ' + className}>
             <div className="card-body">
                 <div className="flex items-center">
                     <h1 className="card-title text-4xl">
