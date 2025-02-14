@@ -96,7 +96,7 @@ export default function Gallery({
                             {gallery ? (
                                 <aside
                                     className={
-                                        'hidden md:block lg:sticky lg:left-0 lg:top-28 lg:mb-10 lg:w-96'
+                                        'lg:sticky lg:left-0 lg:top-28 lg:mb-10 lg:w-96'
                                     }
                                 >
                                     {editing ? (
